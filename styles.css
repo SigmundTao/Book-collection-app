@@ -14,29 +14,33 @@ body {
     border: 1px solid black;
 }
 
-.profile-picture {
-    height: 20vh;
-    aspect-ratio: 1;
-    border: 1px solid black;
-    border-radius: 50%;
+
+/* Search Results */
+.search-result {
+    border: 1px solid red;
+    height: 500px;
 }
 
-.profile-picture:hover {
-    cursor: pointer;
+.search-result-img {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 50%;
+    aspect-ratio: initial;
 }
 
-.profile-pictures-holder {
-    border: 1px solid black;
-    height: 10vh;
-    display: flex;
+.search-result-author {
+    /* styles for each author name */
 }
 
-.pfp {
-    height: 100%;
-    aspect-ratio: 1;
-    border: 1px solid black;
+.search-result-language-holder {
+    /* styles for the language display */
 }
 
-.selected-pic {
-    border: 2px solid red
+.categories-holder {
+    /* styles for the categories container */
+}
+
+.category {
+    /* styles for each category tag */
 }
