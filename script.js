@@ -293,6 +293,8 @@ function displayView(select){
 
 function displayGridView(){
     myBooksHolder.innerHTML = '';
+    const gridViewContainer = document.createElement('div');
+
     user.books.forEach(b => {
         const book = document.createElement('div');
         book.classList.add('book');
@@ -315,9 +317,11 @@ function displayGridView(){
         book.appendChild(title);
         book.appendChild(removeBookBtn);
 
-        myBooksHolder.appendChild(book)
+        gridViewContainer.appendChild(book);
+
         console.log(b.publishedDate)
     })
+    myBooksHolder.appendChild(gridViewContainer)
     displayMyBooks()
 }
 
