@@ -12,9 +12,7 @@ searchBtn.addEventListener('click', () => {
     searchBook()
 })
 
-const user = {
-    books: []
-}
+const user = JSON.parse(localStorage.getItem('user')) || {books: []} 
 
 const bookHolder = document.createElement('div');
 
@@ -204,7 +202,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             cover: image,
             categories: categories,
             description: description,
-            language: bookLanguage,
+            language: language,
             identifiers: identifiers,
             id: id,
             rating: averageRating,
@@ -231,6 +229,7 @@ function addBook(bookObj){
 
     } else {
         user.books.push(bookObj);
+        updateUserData()
     }
 }
 
@@ -246,13 +245,12 @@ function displayMyBooks(){
 
 function deleteBook(bookID){
     const bookIndex = user.books.findIndex(e => e.id === bookID);
-    console.log(bookIndex)
-    console.log(user.books)
 
     user.books.splice(bookIndex, 1);
+    updateUserData()
 }
 
-function oldToOldDateAddedSort(){
+function oldToNewDateAddedSort(){
     user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime())
 }
 
@@ -277,7 +275,7 @@ function sortBooks(select){
     if(select === 'A-Z') aToZSort();
     else if(select === 'Publish Date (old - new)') oldToNewPubDateSort();
     else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
-    else if(select === 'Date Added (old - new)') newToOldDateAddedSort();
+    else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
     else if(select === 'Date Added (new - old)') newToOldPubDateSort();
 
     displayMyBooks()
@@ -293,13 +291,15 @@ function displayView(select){
 function displayGridView(){
     myBooksHolder.innerHTML = '';
     const gridViewContainer = document.createElement('div');
+    gridViewContainer.classList.add('grid-view-container');
 
     user.books.forEach(b => {
         const book = document.createElement('div');
-        book.classList.add('book');
+        book.classList.add('grid-view-book');
 
         const cover =  document.createElement('div');
         cover.style.backgroundImage = `url(${b.cover})`;
+        cover.classList.add('grid-view-cover');
         
         const title = document.createElement('h3');
         title.innerText = b.title;
@@ -322,19 +322,20 @@ function displayGridView(){
     })
     myBooksHolder.appendChild(gridViewContainer)
 
-    console.log('this is what you are looking for')
 }
 
 function displayListView(){
     myBooksHolder.innerHTML = '';
     const listViewContainer = document.createElement('div');
+    listViewContainer.classList.add('list-view-container');
 
     user.books.forEach(b => {
         const book = document.createElement('div');
-        book.classList.add('book');
+        book.classList.add('list-view-book');
 
         const cover =  document.createElement('div');
         cover.style.backgroundImage = `url(${b.cover})`;
+        cover.classList.add('list-view-cover');
         
         const title = document.createElement('h3');
         title.innerText = b.title;
@@ -356,6 +357,8 @@ function displayListView(){
         console.log(b.publishedDate)
     })
     myBooksHolder.appendChild(listViewContainer)
-
-    console.log('this is what you are looking for')
 }
+
+function updateUserData(){localStorage.setItem('user', JSON.stringify(user))}
+
+displayView(viewSelect.value)
