@@ -227,7 +227,11 @@ function loadBookPage(title, authors, description, language, categories, image, 
 }
 
 function addBook(bookObj){
-    user.books.push(bookObj);
+    if(user.books.findIndex(book => book.id === bookObj.id) !== -1){
+
+    } else {
+        user.books.push(bookObj);
+    }
 }
 
 sortSelect.addEventListener('change', () => {
@@ -303,4 +307,12 @@ function sortBooks(select){
     else if(select === 'Date Added (new - old)') newToOldPubDateSort();
 
     displayMyBooks()
+}
+
+function displayBookImageView(){
+
+}
+
+function displayBookInfoView(){
+
 }
