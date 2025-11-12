@@ -3,6 +3,7 @@ const API_KEY = 'AIzaSyABeY9VBDmPih7W8nOf5zndu9I5MtF0wfQ';
 const container = document.getElementById('container');
 const myBooks = document.getElementById('my-books');
 const myBooksHolder = document.getElementById('my-books-holder');
+const sortSelect = document.getElementById('sort-select');
 const searchBtn = document.getElementById('search-btn');
 const searchBar = document.getElementById('search-bar');
 
@@ -43,12 +44,15 @@ function displaySearchResults(data){
         const language = book.volumeInfo.language || 'N/A';
         const categories = book.volumeInfo.categories || [];
         const image = book.volumeInfo.imageLinks?.thumbnail || 'placeholder.jpg';
+        const averageRating = book.volumeInfo.averageRating;
+        const id = book.id;
+        const publishedDate = book.volumeInfo.publishedDate;
 
         const result = document.createElement('div');
         result.classList.add('search-result');
 
         result.addEventListener('click', function(){
-            loadBookPage(bookTitle, authors, description, language, categories, image, identifiers)
+            loadBookPage(bookTitle, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate)
         })
 
         const resultImage = document.createElement('div');
@@ -112,7 +116,7 @@ function displaySearchResults(data){
     });
 }
 
-function loadBookPage(title, authors, description, language, categories, image, identifiers){
+function loadBookPage(title, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate){
     container.innerHTML = '';
     const authorsArray = authors;
     const bookCoverURL = image;
@@ -202,7 +206,10 @@ function loadBookPage(title, authors, description, language, categories, image, 
             description: description,
             language: bookLanguage,
             identifiers: identifiers,
-            id: (user.books.length + 1)
+            id: id,
+            rating: averageRating,
+            publishedDate: publishedDate,
+            dateAdded: new Date().toISOString()
         })
     })
 
@@ -222,6 +229,10 @@ function loadBookPage(title, authors, description, language, categories, image, 
 function addBook(bookObj){
     user.books.push(bookObj);
 }
+
+sortSelect.addEventListener('change', () => {
+    sortBooks(sortSelect.value)
+})
 
 function displayMyBooks(){
     myBooksHolder.innerHTML = '';
@@ -249,6 +260,7 @@ function displayMyBooks(){
         book.appendChild(removeBookBtn);
 
         myBooksHolder.appendChild(book)
+        console.log(b.publishedDate)
     })
 
     console.log(user.books)
@@ -260,4 +272,35 @@ function deleteBook(bookID){
     console.log(user.books)
 
     user.books.splice(bookIndex, 1);
+}
+
+function oldToOldDateAddedSort(){
+    user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime())
+}
+
+function newToOldDateAddedSort(){
+    user.books = [...user.books].sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
+}
+
+function aToZSort(){
+    user.books = [...user.books].sort((a, b) => a.title.localeCompare(b.title, undefined, {sensitivity: 'base'}));
+    console.log(user.books)
+}
+
+function newToOldPubDateSort(){
+    user.books = [...user.books].sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
+}
+
+function oldToNewPubDateSort(){
+    user.books = [...user.books].sort((a, b) => new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime());
+}
+
+function sortBooks(select){
+    if(select === 'A-Z') aToZSort();
+    else if(select === 'Publish Date (old - new)') oldToNewPubDateSort();
+    else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
+    else if(select === 'Date Added (old - new)') newToOldDateAddedSort();
+    else if(select === 'Date Added (new - old)') newToOldPubDateSort();
+
+    displayMyBooks()
 }
