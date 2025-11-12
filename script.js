@@ -4,6 +4,7 @@ const container = document.getElementById('container');
 const myBooks = document.getElementById('my-books');
 const myBooksHolder = document.getElementById('my-books-holder');
 const sortSelect = document.getElementById('sort-select');
+const viewSelect = document.getElementById('book-view-select');
 const searchBtn = document.getElementById('search-btn');
 const searchBar = document.getElementById('search-bar');
 
@@ -241,32 +242,6 @@ sortSelect.addEventListener('change', () => {
 function displayMyBooks(){
     myBooksHolder.innerHTML = '';
 
-    user.books.forEach(b => {
-        const book = document.createElement('div');
-        book.classList.add('book');
-
-        const cover =  document.createElement('div');
-        cover.style.backgroundImage = `url(${b.cover})`;
-        
-        const title = document.createElement('h3');
-        title.innerText = b.title;
-
-        const removeBookBtn = document.createElement('button');
-        removeBookBtn.innerText = 'x';
-
-        removeBookBtn.addEventListener('click', () => {
-            deleteBook(b.id);
-            displayMyBooks()
-        })
-
-        book.appendChild(cover);
-        book.appendChild(title);
-        book.appendChild(removeBookBtn);
-
-        myBooksHolder.appendChild(book)
-        console.log(b.publishedDate)
-    })
-
     console.log(user.books)
 }
 
@@ -309,10 +284,43 @@ function sortBooks(select){
     displayMyBooks()
 }
 
-function displayBookImageView(){
+viewSelect.addEventListener('change', () => displayView(viewSelect.value));
 
+function displayView(select){
+    if(select === 'Grid View') displayGridView();
+    else if(select === 'List View') displayListView();
 }
 
-function displayBookInfoView(){
+function displayGridView(){
+    myBooksHolder.innerHTML = '';
+    user.books.forEach(b => {
+        const book = document.createElement('div');
+        book.classList.add('book');
+
+        const cover =  document.createElement('div');
+        cover.style.backgroundImage = `url(${b.cover})`;
+        
+        const title = document.createElement('h3');
+        title.innerText = b.title;
+
+        const removeBookBtn = document.createElement('button');
+        removeBookBtn.innerText = 'x';
+
+        removeBookBtn.addEventListener('click', () => {
+            deleteBook(b.id);
+            displayMyBooks()
+        })
+
+        book.appendChild(cover);
+        book.appendChild(title);
+        book.appendChild(removeBookBtn);
+
+        myBooksHolder.appendChild(book)
+        console.log(b.publishedDate)
+    })
+    displayMyBooks()
+}
+
+function displayListView(){
 
 }
