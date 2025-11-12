@@ -1,6 +1,8 @@
 const API_KEY = 'AIzaSyABeY9VBDmPih7W8nOf5zndu9I5MtF0wfQ';
 
 const container = document.getElementById('container');
+const myBooks = document.getElementById('my-books');
+const myBooksHolder = document.getElementById('my-books-holder');
 const searchBtn = document.getElementById('search-btn');
 const searchBar = document.getElementById('search-bar');
 
@@ -13,14 +15,6 @@ const user = {
 }
 
 const bookHolder = document.createElement('div');
-
-function addBook(){
-
-}
-
-function deleteBook(){
-
-}
 
 async function searchBook(){
     const bookTitle = searchBar.value;
@@ -52,6 +46,10 @@ function displaySearchResults(data){
 
         const result = document.createElement('div');
         result.classList.add('search-result');
+
+        result.addEventListener('click', function(){
+            loadBookPage(bookTitle, authors, description, language, categories, image, identifiers)
+        })
 
         const resultImage = document.createElement('div');
         resultImage.style.backgroundImage = `url(${image})`;
@@ -112,4 +110,154 @@ function displaySearchResults(data){
 
         container.appendChild(result);
     });
+}
+
+function loadBookPage(title, authors, description, language, categories, image, identifiers){
+    container.innerHTML = '';
+    const authorsArray = authors;
+    const bookCoverURL = image;
+
+    const leftSideHolder = document.createElement('div');
+
+    const bookCover = document.createElement('div');
+    bookCover.classList.add('book-page-cover');
+    bookCover.style.backgroundImage = `url(${bookCoverURL})`;
+
+    leftSideHolder.appendChild(bookCover);
+
+    const rightSideHolder = document.createElement('div')
+
+    const bookTitle = document.createElement('div');
+    bookTitle.classList.add('book-page-title');
+    bookTitle.innerText = title;
+    rightSideHolder.appendChild(bookTitle);
+
+    const authorsHolder = document.createElement('div');
+    rightSideHolder.appendChild(authorsHolder);
+    authorsArray.forEach(author => {
+        const authorCard = document.createElement('div');
+        authorCard.classList.add('author-card');
+        authorCard.innerText = author;
+        authorsHolder.appendChild(authorCard);
+    });
+
+    console.log(categories);
+
+    const categoriesHolder = document.createElement('div');
+    rightSideHolder.appendChild(categoriesHolder);
+    categories.forEach(category => {
+        const genreCard = document.createElement('div');
+        genreCard.classList.add('book-page-category');
+        genreCard.innerText = category;
+        categoriesHolder.appendChild(genreCard);
+    })
+
+    const bookDescription = document.createElement('p');
+    bookDescription.innerText = description;
+    bookDescription.classList.add('book-page-description');
+    rightSideHolder.appendChild(bookDescription);
+
+    const languageHolder = document.createElement('div');
+    languageHolder.classList.add('book-page-language-holder');
+    rightSideHolder.appendChild(languageHolder);
+
+    const langTitle = document.createElement('div');
+    langTitle.innerText = 'Lang:';
+    langTitle.classList.add('book-page-lang-title');
+    languageHolder.appendChild(langTitle);
+
+    const bookLanguage = document.createElement('div');
+    bookLanguage.innerText = language;
+    languageHolder.appendChild(bookLanguage);
+
+    const identifiersArray = identifiers;
+    const identifiersHolder = document.createElement('div');
+    rightSideHolder.appendChild(identifiersHolder);
+
+        identifiersArray.forEach(i => {
+            const type = document.createElement('div');
+            type.innerText = i.type;
+
+            const id = document.createElement('div');
+            id.innerText = i.identifier;
+
+            const div = document.createElement('div');
+            div.appendChild(type);
+            div.appendChild(id);
+
+            identifiersHolder.appendChild(div);
+        })
+
+    const addBookBtn = document.createElement('button');
+    addBookBtn.classList.add('add-book-btn');
+    addBookBtn.innerText = '+';
+    leftSideHolder.appendChild(addBookBtn);
+
+
+    addBookBtn.addEventListener('click', () => {
+        addBook({
+            title: title,
+            cover: image,
+            categories: categories,
+            description: description,
+            language: bookLanguage,
+            identifiers: identifiers,
+            id: (user.books.length + 1)
+        })
+    })
+
+    const quitBtn = document.createElement('button');
+    quitBtn.innerText = 'X';
+    leftSideHolder.appendChild(quitBtn);
+
+    quitBtn.addEventListener('click', () => {
+        displayMyBooks()
+        container.innerHTML = '';
+    })
+    
+    container.appendChild(leftSideHolder);
+    container.appendChild(rightSideHolder);
+}
+
+function addBook(bookObj){
+    user.books.push(bookObj);
+}
+
+function displayMyBooks(){
+    myBooksHolder.innerHTML = '';
+
+    user.books.forEach(b => {
+        const book = document.createElement('div');
+        book.classList.add('book');
+
+        const cover =  document.createElement('div');
+        cover.style.backgroundImage = `url(${b.cover})`;
+        
+        const title = document.createElement('h3');
+        title.innerText = b.title;
+
+        const removeBookBtn = document.createElement('button');
+        removeBookBtn.innerText = 'x';
+
+        removeBookBtn.addEventListener('click', () => {
+            deleteBook(b.id);
+            displayMyBooks()
+        })
+
+        book.appendChild(cover);
+        book.appendChild(title);
+        book.appendChild(removeBookBtn);
+
+        myBooksHolder.appendChild(book)
+    })
+
+    console.log(user.books)
+}
+
+function deleteBook(bookID){
+    const bookIndex = user.books.findIndex(e => e.id === bookID);
+    console.log(bookIndex)
+    console.log(user.books)
+
+    user.books.splice(bookIndex, 1);
 }

@@ -10,7 +10,7 @@ body {
 
 #container {
     height: 50vh;
-    width: 50vw;
+    width: 80vw;
     border: 1px solid black;
 }
 
@@ -43,4 +43,10 @@ body {
 
 .category {
     /* styles for each category tag */
+}
+
+#my-books {
+    border: 1px solid black;
+    width: 80vw;
+    height: 40vh;
 }
