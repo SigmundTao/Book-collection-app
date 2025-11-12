@@ -26,7 +26,6 @@ async function searchBook(){
     const response = await fetch(searchURL);
 
     const data = await response.json();
-    console.log(data);
     displaySearchResults(data)
 }
 
@@ -242,7 +241,7 @@ sortSelect.addEventListener('change', () => {
 function displayMyBooks(){
     myBooksHolder.innerHTML = '';
 
-    console.log(user.books)
+    displayView(viewSelect.value)
 }
 
 function deleteBook(bookID){
@@ -284,7 +283,7 @@ function sortBooks(select){
     displayMyBooks()
 }
 
-viewSelect.addEventListener('change', () => displayView(viewSelect.value));
+viewSelect.addEventListener('change', () => displayMyBooks());
 
 function displayView(select){
     if(select === 'Grid View') displayGridView();
@@ -322,9 +321,41 @@ function displayGridView(){
         console.log(b.publishedDate)
     })
     myBooksHolder.appendChild(gridViewContainer)
-    displayMyBooks()
+
+    console.log('this is what you are looking for')
 }
 
 function displayListView(){
+    myBooksHolder.innerHTML = '';
+    const listViewContainer = document.createElement('div');
 
+    user.books.forEach(b => {
+        const book = document.createElement('div');
+        book.classList.add('book');
+
+        const cover =  document.createElement('div');
+        cover.style.backgroundImage = `url(${b.cover})`;
+        
+        const title = document.createElement('h3');
+        title.innerText = b.title;
+
+        const removeBookBtn = document.createElement('button');
+        removeBookBtn.innerText = 'x';
+
+        removeBookBtn.addEventListener('click', () => {
+            deleteBook(b.id);
+            displayMyBooks()
+        })
+
+        book.appendChild(cover);
+        book.appendChild(title);
+        book.appendChild(removeBookBtn);
+
+        listViewContainer.appendChild(book);
+
+        console.log(b.publishedDate)
+    })
+    myBooksHolder.appendChild(listViewContainer)
+
+    console.log('this is what you are looking for')
 }
