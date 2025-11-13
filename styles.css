@@ -51,45 +51,78 @@ body {
     height: 40vh;
 }
 
+#my-books-holder {
+    border: 1px solid blue;
+    height: 80%;
+}
+
 /* grid view */
 .grid-view-container {
     display: flex;
-    width: 80%;
-    height: 80%;
+    width: 100%;
+    height: 100%;
     flex-wrap: wrap;
     flex-direction: row;
+    gap: 5px;
+    border: 1px solid red;
 }
 
 .grid-view-book {
     border: 1px solid black;
     width: 25%;
     border-radius: 15px;
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
 }
 
 .grid-view-cover {
     height: 80%;
+    border: 1px solid yellow;
+    width: 100%;
     background-repeat: no-repeat;
+    background-position: center;
+}
+
+.grid-view-title {
+    font-size: 1rem;
+    border: 1px solid green;
+    height: 40%;
+    width: 100%;
+}
+
+.grid-view-remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 /* list view */
 .list-view-container {
     width: 100%;
-    height: 80%;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    overflow-y: scroll;
+    border: 1px solid pink;
 }
 
 .list-view-book {
     border: 1px solid black;
     width: 100%;
-    height: 20%;
+    height: 30%;
     border-radius: 15px;
     display: flex;
     justify-content: space-between;
 }
 
 .list-view-cover {
-    height: 90%;
+    height: 100px;
     border: 1px solid red;
+    width: 20%;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 

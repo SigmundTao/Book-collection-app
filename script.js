@@ -5,6 +5,7 @@ const myBooks = document.getElementById('my-books');
 const myBooksHolder = document.getElementById('my-books-holder');
 const sortSelect = document.getElementById('sort-select');
 const viewSelect = document.getElementById('book-view-select');
+const genreSelect = document.getElementById('genre-select');
 const searchBtn = document.getElementById('search-btn');
 const searchBar = document.getElementById('search-bar');
 
@@ -12,7 +13,7 @@ searchBtn.addEventListener('click', () => {
     searchBook()
 })
 
-const user = JSON.parse(localStorage.getItem('user')) || {books: []} 
+const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: []} 
 
 const bookHolder = document.createElement('div');
 
@@ -230,6 +231,7 @@ function addBook(bookObj){
     } else {
         user.books.push(bookObj);
         updateUserData()
+        updateUserGenres()
     }
 }
 
@@ -248,6 +250,7 @@ function deleteBook(bookID){
 
     user.books.splice(bookIndex, 1);
     updateUserData()
+    updateUserGenres()
 }
 
 function oldToNewDateAddedSort(){
@@ -303,9 +306,11 @@ function displayGridView(){
         
         const title = document.createElement('h3');
         title.innerText = b.title;
+        title.classList.add('grid-view-title');
 
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
+        removeBookBtn.classList.add('grid-view-remove-btn');
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
@@ -361,4 +366,40 @@ function displayListView(){
 
 function updateUserData(){localStorage.setItem('user', JSON.stringify(user))}
 
+function updateUserGenres(){
+    user.genres = [];
+
+    user.books.forEach(book => {
+        book.categories.forEach(category => {
+            if(!user.genres.includes(category)){
+                user.genres.push(category);
+            }
+        })
+    })
+
+    updateUserData()
+    fillGenreOptions()    
+}
+
+function fillGenreOptions(){
+    genreSelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = 'All Genres';
+    defaultOption.innerText = 'All Genres';
+    genreSelect.appendChild(defaultOption);
+
+    user.genres.forEach(genre => {
+        const genreOption = document.createElement('option');
+        genreOption.value = genre;
+        genreOption.innerText = genre
+        genreSelect.appendChild(genreOption);
+    })
+}
+
+function displayByGenre(){
+    
+}
+
 displayView(viewSelect.value)
+updateUserGenres()
