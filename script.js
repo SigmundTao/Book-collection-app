@@ -13,7 +13,7 @@ searchBtn.addEventListener('click', () => {
     searchBook()
 })
 
-const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: []} 
+const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], displayingBooks: []} 
 
 const bookHolder = document.createElement('div');
 
@@ -26,10 +26,6 @@ async function searchBook(){
 
     const data = await response.json();
     displaySearchResults(data)
-}
-
-function displayView(){
-
 }
 
 function displaySearchResults(data){
@@ -232,6 +228,7 @@ function addBook(bookObj){
         user.books.push(bookObj);
         updateUserData()
         updateUserGenres()
+        sortBooks(sortSelect.value)
     }
 }
 
@@ -242,7 +239,7 @@ sortSelect.addEventListener('change', () => {
 function displayMyBooks(){
     myBooksHolder.innerHTML = '';
 
-    displayView(viewSelect.value)
+    displayView(viewSelect.value);
 }
 
 function deleteBook(bookID){
@@ -251,6 +248,7 @@ function deleteBook(bookID){
     user.books.splice(bookIndex, 1);
     updateUserData()
     updateUserGenres()
+    sortBooks(sortSelect.value)
 }
 
 function oldToNewDateAddedSort(){
@@ -281,7 +279,7 @@ function sortBooks(select){
     else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
     else if(select === 'Date Added (new - old)') newToOldPubDateSort();
 
-    displayMyBooks()
+    displayByGenre(genreSelect.value)
 }
 
 viewSelect.addEventListener('change', () => displayMyBooks());
@@ -296,7 +294,7 @@ function displayGridView(){
     const gridViewContainer = document.createElement('div');
     gridViewContainer.classList.add('grid-view-container');
 
-    user.books.forEach(b => {
+    user.displayingBooks.forEach(b => {
         const book = document.createElement('div');
         book.classList.add('grid-view-book');
 
@@ -314,7 +312,6 @@ function displayGridView(){
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
-            displayMyBooks()
         })
 
         book.appendChild(cover);
@@ -334,7 +331,7 @@ function displayListView(){
     const listViewContainer = document.createElement('div');
     listViewContainer.classList.add('list-view-container');
 
-    user.books.forEach(b => {
+    user.displayingBooks.forEach(b => {
         const book = document.createElement('div');
         book.classList.add('list-view-book');
 
@@ -350,7 +347,6 @@ function displayListView(){
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
-            displayMyBooks()
         })
 
         book.appendChild(cover);
@@ -397,9 +393,28 @@ function fillGenreOptions(){
     })
 }
 
-function displayByGenre(){
+function displayByGenre(selectedGenre){
+    if(selectedGenre === 'All Genres'){
+        user.displayingBooks = [...user.books];
+        console.log('now displaying all genres')
+        console.log(user.displayingBooks)
+    } else {
+        user.displayingBooks = [];
+        user.books.forEach(book => {
+            if(book.categories.includes(selectedGenre)){
+                user.displayingBooks.push(book);
+            }
+        })
+    }
     
+    displayMyBooks()
 }
 
-displayView(viewSelect.value)
+genreSelect.addEventListener('change', () => {
+    displayByGenre(genreSelect.value);
+})
+
 updateUserGenres()
+genreSelect.value = 'All Genres'
+sortSelect.value = 'A-Z'
+sortBooks('A-Z')
