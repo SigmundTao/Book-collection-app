@@ -5,7 +5,7 @@
 body {
     height: 100vh;
     width: 100vw;
-    background-color: beige;
+    padding-top: 10vh;
 }
 
 #container {
@@ -30,19 +30,31 @@ body {
 }
 
 .search-result-author {
-    /* styles for each author name */
+
 }
 
 .search-result-language-holder {
-    /* styles for the language display */
+
 }
 
 .categories-holder {
-    /* styles for the categories container */
+
 }
 
 .category {
-    /* styles for each category tag */
+
+}
+
+#header {
+    height: 10vh;
+    border: 1px solid black;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #my-books {

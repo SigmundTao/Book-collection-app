@@ -1,13 +1,14 @@
 const API_KEY = 'AIzaSyABeY9VBDmPih7W8nOf5zndu9I5MtF0wfQ';
-
-const container = document.getElementById('container');
-const myBooks = document.getElementById('my-books');
-const myBooksHolder = document.getElementById('my-books-holder');
-const sortSelect = document.getElementById('sort-select');
-const viewSelect = document.getElementById('book-view-select');
-const genreSelect = document.getElementById('genre-select');
 const searchBtn = document.getElementById('search-btn');
 const searchBar = document.getElementById('search-bar');
+const pageHeader = document.getElementById('page-header');
+const pageHolder = document.getElementById('page-holder');
+
+let sortSelect;
+let viewSelect;
+let genreSelect;
+let booksHolder;
+let searchResultsContainer;
 
 searchBtn.addEventListener('click', () => {
     searchBook()
@@ -15,21 +16,25 @@ searchBtn.addEventListener('click', () => {
 
 const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], displayingBooks: []} 
 
-const bookHolder = document.createElement('div');
-
 async function searchBook(){
     const bookTitle = searchBar.value;
     const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
 
-
     const response = await fetch(searchURL);
-
     const data = await response.json();
     displaySearchResults(data)
 }
 
 function displaySearchResults(data){
-    container.innerHTML = '';
+    console.log(data)
+    if (!searchResultsContainer) {
+        searchResultsContainer = document.createElement('div');
+        searchResultsContainer.classList.add('search-results-container');
+        pageHolder.innerHTML = '';
+        pageHolder.appendChild(searchResultsContainer);
+    }
+    
+    searchResultsContainer.innerHTML = '';
 
     data.items.forEach(book => {
         const bookTitle = book.volumeInfo.title || 'No title';
@@ -107,16 +112,21 @@ function displaySearchResults(data){
         result.appendChild(categoriesHolder);
         result.appendChild(identifiersHolder);
 
-        container.appendChild(result);
+        searchResultsContainer.appendChild(result);
     });
 }
 
 function loadBookPage(title, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate){
-    container.innerHTML = '';
+    pageHolder.innerHTML = '';
+    
+    const bookPageContainer = document.createElement('div');
+    bookPageContainer.classList.add('book-page-container');
+    
     const authorsArray = authors;
     const bookCoverURL = image;
 
     const leftSideHolder = document.createElement('div');
+    leftSideHolder.classList.add('book-page-left');
 
     const bookCover = document.createElement('div');
     bookCover.classList.add('book-page-cover');
@@ -124,7 +134,8 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     leftSideHolder.appendChild(bookCover);
 
-    const rightSideHolder = document.createElement('div')
+    const rightSideHolder = document.createElement('div');
+    rightSideHolder.classList.add('book-page-right');
 
     const bookTitle = document.createElement('div');
     bookTitle.classList.add('book-page-title');
@@ -139,8 +150,6 @@ function loadBookPage(title, authors, description, language, categories, image, 
         authorCard.innerText = author;
         authorsHolder.appendChild(authorCard);
     });
-
-    console.log(categories);
 
     const categoriesHolder = document.createElement('div');
     rightSideHolder.appendChild(categoriesHolder);
@@ -173,25 +182,24 @@ function loadBookPage(title, authors, description, language, categories, image, 
     const identifiersHolder = document.createElement('div');
     rightSideHolder.appendChild(identifiersHolder);
 
-        identifiersArray.forEach(i => {
-            const type = document.createElement('div');
-            type.innerText = i.type;
+    identifiersArray.forEach(i => {
+        const type = document.createElement('div');
+        type.innerText = i.type;
 
-            const id = document.createElement('div');
-            id.innerText = i.identifier;
+        const id = document.createElement('div');
+        id.innerText = i.identifier;
 
-            const div = document.createElement('div');
-            div.appendChild(type);
-            div.appendChild(id);
+        const div = document.createElement('div');
+        div.appendChild(type);
+        div.appendChild(id);
 
-            identifiersHolder.appendChild(div);
-        })
+        identifiersHolder.appendChild(div);
+    })
 
     const addBookBtn = document.createElement('button');
     addBookBtn.classList.add('add-book-btn');
     addBookBtn.innerText = '+';
     leftSideHolder.appendChild(addBookBtn);
-
 
     addBookBtn.addEventListener('click', () => {
         addBook({
@@ -210,58 +218,126 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     const quitBtn = document.createElement('button');
     quitBtn.innerText = 'X';
+    quitBtn.classList.add('book-page-quit-btn');
     leftSideHolder.appendChild(quitBtn);
 
     quitBtn.addEventListener('click', () => {
-        displayMyBooks()
-        container.innerHTML = '';
+        generateLibraryPage();
     })
     
-    container.appendChild(leftSideHolder);
-    container.appendChild(rightSideHolder);
+    bookPageContainer.appendChild(leftSideHolder);
+    bookPageContainer.appendChild(rightSideHolder);
+    pageHolder.appendChild(bookPageContainer);
 }
 
 function addBook(bookObj){
     if(user.books.findIndex(book => book.id === bookObj.id) !== -1){
-
+        alert('Book already in library!');
     } else {
         user.books.push(bookObj);
-        updateUserData()
-        updateUserGenres()
-        sortBooks(sortSelect.value)
+        updateUserData();
+        updateUserGenres();
+        generateLibraryPage();
     }
 }
 
-sortSelect.addEventListener('change', () => {
-    sortBooks(sortSelect.value)
-})
+function generateLibraryPage(){
+    pageHolder.innerHTML = '';
+    
+    const libraryPage = document.createElement('div');
+    libraryPage.classList.add('library-page');
+
+    const titleSection = document.createElement('div');
+    titleSection.innerText = 'My Books';
+    titleSection.classList.add('title-section');
+    libraryPage.appendChild(titleSection);
+
+    const filterBar = document.createElement('div');
+    filterBar.classList.add('filter-bar');
+    libraryPage.appendChild(filterBar);
+
+    // Sort container
+    const sortContainer = document.createElement('div');
+    sortContainer.classList.add('sort-container');
+    filterBar.appendChild(sortContainer);
+
+    sortSelect = document.createElement('select');
+    sortSelect.classList.add('sort-select');
+    sortSelect.innerHTML = `
+        <option>A-Z</option>
+        <option>Publish Date (old - new)</option>
+        <option>Publish Date (new - old)</option>
+        <option>Date Added (old - new)</option>
+        <option>Date Added (new - old)</option>
+    `;
+    sortContainer.appendChild(sortSelect);
+
+    const viewContainer = document.createElement('div');
+    viewContainer.classList.add('view-container');
+    filterBar.appendChild(viewContainer);
+
+    viewSelect = document.createElement('select');
+    viewSelect.classList.add('view-select');
+    viewSelect.innerHTML = `
+        <option>Grid View</option>
+        <option>List View</option>
+    `;
+    viewContainer.appendChild(viewSelect);
+
+    const genreContainer = document.createElement('div');
+    genreContainer.classList.add('genre-container');
+    filterBar.appendChild(genreContainer);
+
+    genreSelect = document.createElement('select');
+    genreSelect.classList.add('genre-select');
+    genreContainer.appendChild(genreSelect);
+
+    booksHolder = document.createElement('div');
+    booksHolder.classList.add('books-holder');
+    libraryPage.appendChild(booksHolder);
+
+    pageHolder.appendChild(libraryPage);
+
+    sortSelect.addEventListener('change', () => {
+        sortBooks(sortSelect.value);
+    });
+
+    viewSelect.addEventListener('change', () => {
+        displayMyBooks();
+    });
+
+    genreSelect.addEventListener('change', () => {
+        displayByGenre(genreSelect.value);
+    });
+
+    fillGenreOptions();
+    sortSelect.value = 'A-Z';
+    sortBooks('A-Z');
+}
 
 function displayMyBooks(){
-    myBooksHolder.innerHTML = '';
-
+    booksHolder.innerHTML = '';
     displayView(viewSelect.value);
 }
 
 function deleteBook(bookID){
     const bookIndex = user.books.findIndex(e => e.id === bookID);
-
     user.books.splice(bookIndex, 1);
-    updateUserData()
-    updateUserGenres()
-    sortBooks(sortSelect.value)
+    updateUserData();
+    updateUserGenres();
+    sortBooks(sortSelect.value);
 }
 
 function oldToNewDateAddedSort(){
-    user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime())
+    user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime());
 }
 
 function newToOldDateAddedSort(){
-    user.books = [...user.books].sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime())
+    user.books = [...user.books].sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
 }
 
 function aToZSort(){
     user.books = [...user.books].sort((a, b) => a.title.localeCompare(b.title, undefined, {sensitivity: 'base'}));
-    console.log(user.books)
 }
 
 function newToOldPubDateSort(){
@@ -277,12 +353,10 @@ function sortBooks(select){
     else if(select === 'Publish Date (old - new)') oldToNewPubDateSort();
     else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
     else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
-    else if(select === 'Date Added (new - old)') newToOldPubDateSort();
+    else if(select === 'Date Added (new - old)') newToOldDateAddedSort();
 
-    displayByGenre(genreSelect.value)
+    displayByGenre(genreSelect.value);
 }
-
-viewSelect.addEventListener('change', () => displayMyBooks());
 
 function displayView(select){
     if(select === 'Grid View') displayGridView();
@@ -290,7 +364,8 @@ function displayView(select){
 }
 
 function displayGridView(){
-    myBooksHolder.innerHTML = '';
+    booksHolder.innerHTML = '';
+
     const gridViewContainer = document.createElement('div');
     gridViewContainer.classList.add('grid-view-container');
 
@@ -298,7 +373,7 @@ function displayGridView(){
         const book = document.createElement('div');
         book.classList.add('grid-view-book');
 
-        const cover =  document.createElement('div');
+        const cover = document.createElement('div');
         cover.style.backgroundImage = `url(${b.cover})`;
         cover.classList.add('grid-view-cover');
         
@@ -312,22 +387,21 @@ function displayGridView(){
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
-        })
+        });
 
         book.appendChild(cover);
         book.appendChild(title);
         book.appendChild(removeBookBtn);
 
         gridViewContainer.appendChild(book);
-
-        console.log(b.publishedDate)
-    })
-    myBooksHolder.appendChild(gridViewContainer)
-
+    });
+    
+    booksHolder.appendChild(gridViewContainer);
 }
 
 function displayListView(){
-    myBooksHolder.innerHTML = '';
+    booksHolder.innerHTML = '';
+
     const listViewContainer = document.createElement('div');
     listViewContainer.classList.add('list-view-container');
 
@@ -335,7 +409,7 @@ function displayListView(){
         const book = document.createElement('div');
         book.classList.add('list-view-book');
 
-        const cover =  document.createElement('div');
+        const cover = document.createElement('div');
         cover.style.backgroundImage = `url(${b.cover})`;
         cover.classList.add('list-view-cover');
         
@@ -347,20 +421,21 @@ function displayListView(){
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
-        })
+        });
 
         book.appendChild(cover);
         book.appendChild(title);
         book.appendChild(removeBookBtn);
 
         listViewContainer.appendChild(book);
+    });
 
-        console.log(b.publishedDate)
-    })
-    myBooksHolder.appendChild(listViewContainer)
+    booksHolder.appendChild(listViewContainer);
 }
 
-function updateUserData(){localStorage.setItem('user', JSON.stringify(user))}
+function updateUserData(){
+    localStorage.setItem('user', JSON.stringify(user));
+}
 
 function updateUserGenres(){
     user.genres = [];
@@ -370,11 +445,14 @@ function updateUserGenres(){
             if(!user.genres.includes(category)){
                 user.genres.push(category);
             }
-        })
-    })
+        });
+    });
 
-    updateUserData()
-    fillGenreOptions()    
+    updateUserData();
+    
+    if (genreSelect) {
+        fillGenreOptions();
+    }
 }
 
 function fillGenreOptions(){
@@ -388,33 +466,24 @@ function fillGenreOptions(){
     user.genres.forEach(genre => {
         const genreOption = document.createElement('option');
         genreOption.value = genre;
-        genreOption.innerText = genre
+        genreOption.innerText = genre;
         genreSelect.appendChild(genreOption);
-    })
+    });
 }
 
 function displayByGenre(selectedGenre){
     if(selectedGenre === 'All Genres'){
         user.displayingBooks = [...user.books];
-        console.log('now displaying all genres')
-        console.log(user.displayingBooks)
     } else {
         user.displayingBooks = [];
         user.books.forEach(book => {
             if(book.categories.includes(selectedGenre)){
                 user.displayingBooks.push(book);
             }
-        })
+        });
     }
     
-    displayMyBooks()
+    displayMyBooks();
 }
 
-genreSelect.addEventListener('change', () => {
-    displayByGenre(genreSelect.value);
-})
-
-updateUserGenres()
-genreSelect.value = 'All Genres'
-sortSelect.value = 'A-Z'
-sortBooks('A-Z')
+generateLibraryPage();
