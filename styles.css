@@ -73,6 +73,11 @@ body {
     justify-content: center;
 }
 
+.location-card:hover {
+    cursor: pointer;
+    border: 1px solid black;
+}
+
 /* grid view */
 .grid-view-container {
     display: flex;

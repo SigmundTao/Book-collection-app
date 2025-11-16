@@ -296,6 +296,9 @@ function generateLibraryPage(){
     genreSelect.classList.add('genre-select');
     genreContainer.appendChild(genreSelect);
 
+    const removeLocationDialog = document.createElement('dialog');
+    libraryPage.appendChild(removeLocationDialog);
+
     const locationContainer = document.createElement('div');
     filterBar.appendChild(locationContainer);
     locationSelect = document.createElement('select');
@@ -312,12 +315,30 @@ function generateLibraryPage(){
         location.value = l;
         location.innerText = l;
 
-        locationSelect.appendChild(location)
+        locationSelect.appendChild(location);
+
+        const locationCard = document.createElement('div');
+        locationCard.innerText = l;
+        locationCard.classList.add('location-card')
+        removeLocationDialog.appendChild(locationCard);
+
+        locationCard.addEventListener('click', () => {
+            removeLocation(locationCard.innerText, removeLocationDialog);
+        })
     })
 
     const addNewLocationBtn = document.createElement('button');
     addNewLocationBtn.innerText = 'add new location'
     filterBar.appendChild(addNewLocationBtn);
+
+    const removeLocationBtn = document.createElement('button');
+    removeLocationBtn.innerText = 'remove location'
+    filterBar.appendChild(removeLocationBtn);
+    removeLocationBtn.addEventListener('click', () => {
+        openDialog(removeLocationDialog)
+    })
+
+    
     
     booksHolder = document.createElement('div');
     booksHolder.classList.add('books-holder');
@@ -364,7 +385,7 @@ function generateLibraryPage(){
         closeDialog(newLocationDialog);
     })
 
-    addNewLocationBtn.addEventListener('click', () => {addNewLocation(newLocationDialog)})
+    addNewLocationBtn.addEventListener('click', () => {openDialog(newLocationDialog)})
 
     fillGenreOptions();
     sortSelect.value = 'A-Z';
@@ -553,7 +574,7 @@ function filterBooks(){
     displayMyBooks()
 }
 
-function addNewLocation(dialog){
+function openDialog(dialog){
     dialog.showModal();
 }
 
@@ -565,6 +586,13 @@ function saveNewLocation(location){
 
 function closeDialog(dialog){
     dialog.close();
+}
+
+function removeLocation(location, dialog){
+    user.locations = user.locations.filter(l => l !== location);
+    updateUserData()
+    closeDialog(dialog)
+    generateLibraryPage()
 }
 
 generateLibraryPage();
