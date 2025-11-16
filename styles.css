@@ -68,6 +68,11 @@ body {
     height: 80%;
 }
 
+.filter-bar {
+    display: flex;
+    justify-content: center;
+}
+
 /* grid view */
 .grid-view-container {
     display: flex;

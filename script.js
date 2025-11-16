@@ -268,6 +268,7 @@ function generateLibraryPage(){
     sortSelect.classList.add('sort-select');
     sortSelect.innerHTML = `
         <option>A-Z</option>
+        <option>Z-A</option>
         <option>Publish Date (old - new)</option>
         <option>Publish Date (new - old)</option>
         <option>Date Added (old - new)</option>
@@ -368,6 +369,10 @@ function aToZSort(){
     user.books = [...user.books].sort((a, b) => a.title.localeCompare(b.title, undefined, {sensitivity: 'base'}));
 }
 
+function zToASort(){
+    user.books = [...user.books].sort((a, b) => b.title.localeCompare(a.title, undefined, {sensitivity: 'base'}));
+}
+
 function newToOldPubDateSort(){
     user.books = [...user.books].sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
 }
@@ -378,6 +383,7 @@ function oldToNewPubDateSort(){
 
 function sortBooks(select){
     if(select === 'A-Z') aToZSort();
+    else if(select === 'Z-A') zToASort();
     else if(select === 'Publish Date (old - new)') oldToNewPubDateSort();
     else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
     else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
