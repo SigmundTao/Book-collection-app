@@ -315,6 +315,9 @@ function generateLibraryPage(){
         locationSelect.appendChild(location)
     })
 
+    const addNewLocationBtn = document.createElement('button');
+    addNewLocationBtn.innerText = 'add new location'
+    filterBar.appendChild(addNewLocationBtn);
     
     booksHolder = document.createElement('div');
     booksHolder.classList.add('books-holder');
@@ -338,6 +341,30 @@ function generateLibraryPage(){
         filterBooks();
     });
 
+    const newLocationDialog = document.createElement('dialog');
+    libraryPage.appendChild(newLocationDialog);
+
+    const locationInput = document.createElement('input');
+    locationInput.type = Text;
+    newLocationDialog.appendChild(locationInput);
+
+    const closeDialogBtn = document.createElement('button');
+    closeDialogBtn.classList.add('close-dialog-btn');
+    closeDialogBtn.innerText = 'x';
+    newLocationDialog.appendChild(closeDialogBtn);
+    closeDialogBtn.addEventListener('click', () => {
+        closeDialog(newLocationDialog);
+    })
+
+    const saveNewLocationBtn = document.createElement('button');
+    newLocationDialog.appendChild(saveNewLocationBtn);
+    saveNewLocationBtn.innerText = 'Save';
+    saveNewLocationBtn.addEventListener('click', () => {
+        saveNewLocation(locationInput.value);
+        closeDialog(newLocationDialog);
+    })
+
+    addNewLocationBtn.addEventListener('click', () => {addNewLocation(newLocationDialog)})
 
     fillGenreOptions();
     sortSelect.value = 'A-Z';
@@ -524,6 +551,20 @@ function filterBooks(){
     } 
 
     displayMyBooks()
+}
+
+function addNewLocation(dialog){
+    dialog.showModal();
+}
+
+function saveNewLocation(location){
+    user.locations.push(location);
+    updateUserData();
+    generateLibraryPage();
+}
+
+function closeDialog(dialog){
+    dialog.close();
 }
 
 generateLibraryPage();
