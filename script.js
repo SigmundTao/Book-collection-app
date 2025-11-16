@@ -9,12 +9,15 @@ let viewSelect;
 let genreSelect;
 let booksHolder;
 let searchResultsContainer;
+let locationSelect;
 
 searchBtn.addEventListener('click', () => {
     searchBook()
 })
 
-const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], displayingBooks: []} 
+const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], displayingBooks: [], locations: ['Physical Copy', 'Kindle']} 
+
+let filteredBooks = [...user.books];
 
 async function searchBook(){
     const bookTitle = searchBar.value;
@@ -212,7 +215,8 @@ function loadBookPage(title, authors, description, language, categories, image, 
             id: id,
             rating: averageRating,
             publishedDate: publishedDate,
-            dateAdded: new Date().toISOString()
+            dateAdded: new Date().toISOString(),
+            location: 'Physical Copy',
         })
     })
 
@@ -256,7 +260,6 @@ function generateLibraryPage(){
     filterBar.classList.add('filter-bar');
     libraryPage.appendChild(filterBar);
 
-    // Sort container
     const sortContainer = document.createElement('div');
     sortContainer.classList.add('sort-container');
     filterBar.appendChild(sortContainer);
@@ -292,6 +295,26 @@ function generateLibraryPage(){
     genreSelect.classList.add('genre-select');
     genreContainer.appendChild(genreSelect);
 
+    const locationContainer = document.createElement('div');
+    filterBar.appendChild(locationContainer);
+    locationSelect = document.createElement('select');
+    locationSelect.classList.add('location-select');
+    locationContainer.appendChild(locationSelect)
+
+    const defaultLocation = document.createElement('option');
+    defaultLocation.value = 'All Locations';
+    defaultLocation.innerText = 'All Locations';
+    locationSelect.appendChild(defaultLocation);
+
+    user.locations.forEach(l => {
+        const location = document.createElement('option');
+        location.value = l;
+        location.innerText = l;
+
+        locationSelect.appendChild(location)
+    })
+
+    
     booksHolder = document.createElement('div');
     booksHolder.classList.add('books-holder');
     libraryPage.appendChild(booksHolder);
@@ -307,8 +330,13 @@ function generateLibraryPage(){
     });
 
     genreSelect.addEventListener('change', () => {
-        displayByGenre(genreSelect.value);
+        filterBooks();
     });
+
+    locationSelect.addEventListener('change', () => {
+        filterBooks();
+    });
+
 
     fillGenreOptions();
     sortSelect.value = 'A-Z';
@@ -355,7 +383,7 @@ function sortBooks(select){
     else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
     else if(select === 'Date Added (new - old)') newToOldDateAddedSort();
 
-    displayByGenre(genreSelect.value);
+    filterBooks();
 }
 
 function displayView(select){
@@ -369,7 +397,7 @@ function displayGridView(){
     const gridViewContainer = document.createElement('div');
     gridViewContainer.classList.add('grid-view-container');
 
-    user.displayingBooks.forEach(b => {
+    filteredBooks.forEach(b => {
         const book = document.createElement('div');
         book.classList.add('grid-view-book');
 
@@ -405,7 +433,7 @@ function displayListView(){
     const listViewContainer = document.createElement('div');
     listViewContainer.classList.add('list-view-container');
 
-    user.displayingBooks.forEach(b => {
+    filteredBooks.forEach(b => {
         const book = document.createElement('div');
         book.classList.add('list-view-book');
 
@@ -471,19 +499,25 @@ function fillGenreOptions(){
     });
 }
 
-function displayByGenre(selectedGenre){
-    if(selectedGenre === 'All Genres'){
-        user.displayingBooks = [...user.books];
-    } else {
-        user.displayingBooks = [];
-        user.books.forEach(book => {
-            if(book.categories.includes(selectedGenre)){
-                user.displayingBooks.push(book);
-            }
-        });
+function resetFilters(){
+    filteredBooks = [...user.books]
+    displayMyBooks()
+}
+
+function filterBooks(){
+    filteredBooks = [...user.books];
+
+    const selectedGenre = genreSelect.value;
+    if(selectedGenre !== 'All Genres'){
+        filteredBooks = filteredBooks.filter(b => b.categories.includes(selectedGenre));
     }
     
-    displayMyBooks();
+    const selectedLocation = locationSelect.value;
+    if(selectedLocation !== 'All Locations'){
+        filteredBooks = filteredBooks.filter(b => b.location === selectedLocation);
+    } 
+
+    displayMyBooks()
 }
 
 generateLibraryPage();
