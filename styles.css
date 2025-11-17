@@ -160,7 +160,7 @@ body {
 
 .book-rating {
     border: 1px solid black;
-    height: 20%;
+    height: 12%;
     aspect-ratio: 1;
     display: flex;
     justify-content: center;

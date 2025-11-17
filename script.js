@@ -621,6 +621,8 @@ function openEditDialog(book, container){
         undreadOrReadSelect.appendChild(statusOption);
     })
 
+    undreadOrReadSelect.value = book.readStatus;
+
     const bookRatingTitle = document.createElement('h3');
     bookRatingTitle.innerText = 'Rating:'
 
@@ -645,7 +647,7 @@ function openEditDialog(book, container){
     
     let noRating = true;
 
-    if(book.readStatus){
+    if(book.readStatus !== 'Unread'){
         editBookRating.style.display = 'inline';
         bookRatingTitle.style.display = 'inline-block';
         noRating = false;
