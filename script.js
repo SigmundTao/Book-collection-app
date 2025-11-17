@@ -345,6 +345,8 @@ function generateLibraryPage(){
         <option>Publish Date (new - old)</option>
         <option>Date Added (old - new)</option>
         <option>Date Added (new - old)</option>
+        <option>Rating (High - Low)</option>
+        <option>Rating (Low - High)</option>
     `;
     sortContainer.appendChild(sortSelect);
 
@@ -477,6 +479,7 @@ function deleteBook(bookID){
     sortBooks(sortSelect.value);
 }
 
+//Book order sorting
 function oldToNewDateAddedSort(){
     user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime());
 }
@@ -501,6 +504,14 @@ function oldToNewPubDateSort(){
     user.books = [...user.books].sort((a, b) => new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime());
 }
 
+function ratingSortHighToLow(){
+    user.books = [...user.books].sort((a, b) => b.rating - a.rating);
+}
+
+function ratingSortLowToHigh(){
+    user.books = [...user.books].sort((a, b) => a.rating - b.rating);
+}
+
 function sortBooks(select){
     if(select === 'A-Z') aToZSort();
     else if(select === 'Z-A') zToASort();
@@ -508,6 +519,8 @@ function sortBooks(select){
     else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
     else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
     else if(select === 'Date Added (new - old)') newToOldDateAddedSort();
+    else if(select === 'Rating (High - Low)') ratingSortHighToLow();
+    else if(select === 'Rating (Low - High)') ratingSortLowToHigh();
 
     filterBooks();
 }
@@ -665,7 +678,7 @@ function filterBooks(){
     const selectedLocation = locationSelect.value;
     if(selectedLocation !== 'All Locations'){
         filteredBooks = filteredBooks.filter(b => b.location === selectedLocation);
-    } 
+    }
 
     displayMyBooks()
 }
