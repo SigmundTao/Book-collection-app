@@ -15,7 +15,7 @@ searchBtn.addEventListener('click', () => {
     searchBook()
 })
 
-const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], displayingBooks: [], locations: ['Physical Copy', 'Kindle']} 
+const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], locations: ['Physical Copy', 'Kindle']} 
 
 let filteredBooks = [...user.books];
 
@@ -204,21 +204,77 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookBtn.innerText = '+';
     leftSideHolder.appendChild(addBookBtn);
 
-    addBookBtn.addEventListener('click', () => {
+    const addBookDialog = document.createElement('dialog');
+    addBookDialog.id = 'add-book-dialog';
+    bookPageContainer.appendChild(addBookDialog);
+
+    const dialogTitle = document.createElement('input');
+    dialogTitle.classList.add('add-book-dialog-title');
+    dialogTitle.value = title;
+
+    const dialogImage = document.createElement('div');
+    dialogImage.classList.add('add-book-dialog-image');
+
+    const imageLink = document.createElement('input');
+    imageLink.type = 'text';
+    imageLink.value = image;
+
+    dialogImage.style.backgroundImage = `url(${imageLink.value})`;
+
+    const rating = document.createElement('input');
+    rating.type = 'number';
+    rating.classList.add('add-book-rating');
+    rating.min = 0;
+    rating.max = 10;
+
+    const locationsHolder = document.createElement('select');
+    user.locations.forEach(l => {
+        const locationOption = document.createElement('option');
+        locationOption.innerText = l;
+        locationOption.value = l;
+
+        locationsHolder.appendChild(locationOption);
+    })
+
+    const saveBookBtn = document.createElement('button');
+    saveBookBtn.innerText = 'Add Book';
+
+    const closeAddBookDialogBtn = document.createElement('button');
+    closeAddBookDialogBtn.classList.add('close-add-book-dialog-btn');
+
+    addBookDialog.appendChild(dialogTitle);
+    addBookDialog.appendChild(dialogImage);
+    addBookDialog.appendChild(imageLink);
+    addBookDialog.appendChild(rating);
+    addBookDialog.appendChild(locationsHolder);
+    addBookDialog.appendChild(saveBookBtn);
+
+    saveBookBtn.addEventListener('click', () => {
         addBook({
-            title: title,
-            cover: image,
+            title: dialogTitle.value,
+            cover: imageLink.value,
             categories: categories,
             description: description,
             language: language,
             identifiers: identifiers,
             id: id,
-            rating: averageRating,
+            rating: rating.value,
             publishedDate: publishedDate,
             dateAdded: new Date().toISOString(),
             location: 'Physical Copy',
         })
+
+        closeDialog(addBookDialog);
+        generateLibraryPage()
     })
+
+    closeAddBookDialogBtn.addEventListener('click', () => {
+        closeDialog(addBookDialog);
+    })
+    
+    addBookBtn.addEventListener('click', () => {
+        openDialog(addBookDialog);
+    });
 
     const quitBtn = document.createElement('button');
     quitBtn.innerText = 'X';
@@ -590,6 +646,7 @@ function closeDialog(dialog){
 
 function removeLocation(location, dialog){
     user.locations = user.locations.filter(l => l !== location);
+    user.books = user.books.filter(b => b.location != location);
     updateUserData()
     closeDialog(dialog)
     generateLibraryPage()

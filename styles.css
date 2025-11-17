@@ -55,6 +55,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: blue;
 }
 
 #my-books {
@@ -148,3 +149,10 @@ body {
     background-repeat: no-repeat;
 }
 
+.add-book-dialog-image {
+    border: 1px solid red;
+    height: 10vh;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
