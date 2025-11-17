@@ -585,6 +585,114 @@ function getRatingColour(rating){
     else if(rating === 10) {return ['darkgreen', 'white']}
 }
 
+function openEditDialog(book, container){
+    const editBookDialog = document.createElement('dialog');
+
+    const dialogDiv = document.createElement('div');
+    dialogDiv.classList.add('dialog-div');
+    editBookDialog.appendChild(dialogDiv);
+
+    const title = document.createElement('h3');
+    title.innerText = 'Title:';
+
+    const editBookTitle = document.createElement('input');
+    editBookTitle.type = 'text';
+    editBookTitle.value = book.title;
+
+    const editBookPhoto = document.createElement('div');
+    editBookPhoto.style.backgroundImage = `url(${book.cover})`;
+
+    const link = document.createElement('h3');
+    link.innerText = 'Photo URL:'
+
+    const editBookLink = document.createElement('input');
+    editBookLink.type = Text;
+    editBookLink.value = book.cover;
+
+    const readingStatusTitle = document.createElement('h3');
+    readingStatusTitle.innerText = 'Read Status:'
+
+    const undreadOrReadSelect = document.createElement('select');
+
+    readingSatuses.forEach(s => {
+        const statusOption = document.createElement('option');
+        statusOption.innerText = s;
+
+        undreadOrReadSelect.appendChild(statusOption);
+    })
+
+    const bookRatingTitle = document.createElement('h3');
+    bookRatingTitle.innerText = 'Rating:'
+
+    const editBookRating = document.createElement('input');
+    editBookRating.type = 'number';
+    editBookRating.max = 10;
+    editBookRating.min = 1;
+    editBookRating.value = book.rating;
+
+    const saveBtn = document.createElement('button');
+    saveBtn.innerText = 'save';
+
+    dialogDiv.appendChild(title);
+    dialogDiv.appendChild(editBookTitle);
+    dialogDiv.appendChild(editBookPhoto);
+    dialogDiv.appendChild(link);
+    dialogDiv.appendChild(editBookLink);
+    dialogDiv.appendChild(undreadOrReadSelect);
+    dialogDiv.appendChild(bookRatingTitle);
+    dialogDiv.appendChild(editBookRating);
+    dialogDiv.appendChild(saveBtn);
+    
+    let noRating = true;
+
+    if(book.readStatus){
+        editBookRating.style.display = 'inline';
+        bookRatingTitle.style.display = 'inline-block';
+        noRating = false;
+    } else {
+        editBookRating.style.display = 'none';
+        bookRatingTitle.style.display = 'none';
+    }
+
+    undreadOrReadSelect.addEventListener('change', () => {
+        if(undreadOrReadSelect.value === 'Unread'){
+            editBookRating.style.display = 'none';
+            bookRatingTitle.style.display = 'none';
+            noRating = true;
+        } else {
+            editBookRating.style.display = 'inline';
+            bookRatingTitle.style.display = 'inline-block';
+            noRating = false;
+        }
+    })
+
+    saveBtn.addEventListener('click', () => {
+        const bookIndex = user.books.findIndex(i => i.id === book.id);
+
+        const ratingValue = noRating ? null : editBookRating.value;
+
+        user.books[bookIndex].rating = ratingValue;
+        user.books[bookIndex].readStatus = undreadOrReadSelect.value;
+        user.books[bookIndex].cover = editBookLink.value;
+        user.books[bookIndex].title = editBookTitle.value;
+        
+        updateUserData()
+        closeDialog(editBookDialog);
+        displayMyBooks()
+    })
+
+    const closeDialogBtn = document.createElement('button');
+    closeDialogBtn.innerText = 'X';
+    dialogDiv.appendChild(closeDialogBtn);
+
+    closeDialogBtn.addEventListener('click', () => {
+        closeDialog(editBookDialog);
+    })
+
+    container.appendChild(editBookDialog);
+    openDialog(editBookDialog)
+}
+
 function displayGridView(){
     booksHolder.innerHTML = '';
 
@@ -602,6 +710,11 @@ function displayGridView(){
         const title = document.createElement('h3');
         title.innerText = b.title;
         title.classList.add('grid-view-title');
+
+        const editBookBtn = document.createElement('button');
+        editBookBtn.innerText = 'edit';
+
+        editBookBtn.addEventListener('click', () => {openEditDialog(b, booksHolder)})
 
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
@@ -633,6 +746,7 @@ function displayGridView(){
         book.appendChild(title);
         book.appendChild(readStatus);
         book.appendChild(removeBookBtn);
+        book.appendChild(editBookBtn);
 
         gridViewContainer.appendChild(book);
     });

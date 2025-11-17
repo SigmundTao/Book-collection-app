@@ -170,3 +170,10 @@ body {
     right: 5px;
     top: 40%;
 }
+
+.dialog-div {
+    gap: 10px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+}
