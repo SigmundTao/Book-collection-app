@@ -10,6 +10,10 @@ let genreSelect;
 let booksHolder;
 let searchResultsContainer;
 let locationSelect;
+let readSelect;
+
+const readingSatuses = ['Read', 'Reading', 'Unread'];
+
 
 searchBtn.addEventListener('click', () => {
     searchBook()
@@ -241,14 +245,19 @@ function loadBookPage(title, authors, description, language, categories, image, 
     const readStatusSelect = document.createElement('select');
     readStatusSelect.classList.add('read-status-select');
 
-    const readOptions = ['Read', 'Reading', 'Unread'];
-    readOptions.forEach(opt => {
+    readingSatuses.forEach(opt => {
         const optionDiv = document.createElement('option');
         optionDiv.innerText = opt;
         optionDiv.value = opt;
 
         readStatusSelect.appendChild(optionDiv);
     })
+
+    const numberOfCopies = document.createElement('input');
+    numberOfCopies.type = 'number';
+    numberOfCopies.value = 1;
+    numberOfCopies.min = 1;
+    numberOfCopies.max = 100;
 
     const saveBookBtn = document.createElement('button');
     saveBookBtn.innerText = 'Add Book';
@@ -370,6 +379,21 @@ function generateLibraryPage(){
     genreSelect.classList.add('genre-select');
     genreContainer.appendChild(genreSelect);
 
+    readSelect = document.createElement('select');
+    const allStatuses = document.createElement('option');
+    allStatuses.innerText = 'Read/Reading/Unread';
+    allStatuses.value = 'Read/Reading/Unread';
+    readSelect.appendChild(allStatuses);
+
+    readingSatuses.forEach(status => {
+        const statusOption = document.createElement('option');
+        statusOption.innerText = status;
+        statusOption.value = status;
+
+        readSelect.appendChild(statusOption);
+    })
+    filterBar.appendChild(readSelect);
+
     const removeLocationDialog = document.createElement('dialog');
     libraryPage.appendChild(removeLocationDialog);
 
@@ -431,6 +455,10 @@ function generateLibraryPage(){
     genreSelect.addEventListener('change', () => {
         filterBooks();
     });
+
+    readSelect.addEventListener('change', () => {
+        filterBooks();
+    })
 
     locationSelect.addEventListener('change', () => {
         filterBooks();
@@ -679,6 +707,12 @@ function filterBooks(){
     if(selectedLocation !== 'All Locations'){
         filteredBooks = filteredBooks.filter(b => b.location === selectedLocation);
     }
+
+    const readingStatus = readSelect.value;
+    if(readingStatus !== 'Read/Reading/Unread'){
+        filteredBooks = filteredBooks.filter(b => b.readStatus === readingStatus);
+    }
+
 
     displayMyBooks()
 }
