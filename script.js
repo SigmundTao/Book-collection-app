@@ -223,6 +223,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     const rating = document.createElement('input');
     rating.type = 'number';
+    rating.value = 5;
     rating.classList.add('add-book-rating');
     rating.min = 0;
     rating.max = 10;
@@ -522,6 +523,11 @@ function displayGridView(){
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
         removeBookBtn.classList.add('grid-view-remove-btn');
+
+        const ratingDiv = document.createElement('div');
+        ratingDiv.classList.add('book-rating');
+        ratingDiv.innerText = b.rating;
+        book.appendChild(ratingDiv);
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);

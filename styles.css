@@ -156,3 +156,16 @@ body {
     background-repeat: no-repeat;
     background-size: contain;
 }
+
+.book-rating {
+    border: 1px solid red;
+    height: 20%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    top: 40%;
+}
