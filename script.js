@@ -204,6 +204,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookBtn.innerText = '+';
     leftSideHolder.appendChild(addBookBtn);
 
+    //add book dialog
     const addBookDialog = document.createElement('dialog');
     addBookDialog.id = 'add-book-dialog';
     bookPageContainer.appendChild(addBookDialog);
@@ -237,6 +238,18 @@ function loadBookPage(title, authors, description, language, categories, image, 
         locationsHolder.appendChild(locationOption);
     })
 
+    const readStatusSelect = document.createElement('select');
+    readStatusSelect.classList.add('read-status-select');
+
+    const readOptions = ['Read', 'Reading', 'Unread'];
+    readOptions.forEach(opt => {
+        const optionDiv = document.createElement('option');
+        optionDiv.innerText = opt;
+        optionDiv.value = opt;
+
+        readStatusSelect.appendChild(optionDiv);
+    })
+
     const saveBookBtn = document.createElement('button');
     saveBookBtn.innerText = 'Add Book';
 
@@ -248,6 +261,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookDialog.appendChild(imageLink);
     addBookDialog.appendChild(rating);
     addBookDialog.appendChild(locationsHolder);
+    addBookDialog.appendChild(readStatusSelect);
     addBookDialog.appendChild(saveBookBtn);
 
     saveBookBtn.addEventListener('click', () => {
@@ -260,6 +274,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             identifiers: identifiers,
             id: id,
             rating: rating.value,
+            readStatus: readStatusSelect.value,
             publishedDate: publishedDate,
             dateAdded: new Date().toISOString(),
             location: 'Physical Copy',
@@ -527,7 +542,12 @@ function displayGridView(){
         const ratingDiv = document.createElement('div');
         ratingDiv.classList.add('book-rating');
         ratingDiv.innerText = b.rating;
-        book.appendChild(ratingDiv);
+
+        const readStatus = document.createElement('div');
+        if(!b.readStatus){
+            b.readStatus = 'Unread'
+        }
+        readStatus.innerText = b.readStatus;
 
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
@@ -535,6 +555,8 @@ function displayGridView(){
 
         book.appendChild(cover);
         book.appendChild(title);
+        book.appendChild(readStatus);
+        book.appendChild(ratingDiv);
         book.appendChild(removeBookBtn);
 
         gridViewContainer.appendChild(book);
@@ -563,12 +585,24 @@ function displayListView(){
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
 
+        const ratingDiv = document.createElement('div');
+        ratingDiv.classList.add('book-rating');
+        ratingDiv.innerText = b.rating;
+
+        const readStatus = document.createElement('div');
+        if(!b.readStatus){
+            b.readStatus = 'Unread'
+        }
+        readStatus.innerText = b.readStatus;
+
         removeBookBtn.addEventListener('click', () => {
             deleteBook(b.id);
         });
 
         book.appendChild(cover);
         book.appendChild(title);
+        book.appendChild(readStatus);
+        book.appendChild(ratingDiv);
         book.appendChild(removeBookBtn);
 
         listViewContainer.appendChild(book);
