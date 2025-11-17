@@ -159,7 +159,7 @@ body {
 }
 
 .book-rating {
-    border: 1px solid red;
+    border: 1px solid black;
     height: 20%;
     aspect-ratio: 1;
     display: flex;

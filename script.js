@@ -227,11 +227,12 @@ function loadBookPage(title, authors, description, language, categories, image, 
     dialogImage.style.backgroundImage = `url(${imageLink.value})`;
 
     const rating = document.createElement('input');
+    rating.classList.add('rating')
     rating.type = 'number';
-    rating.value = 5;
     rating.classList.add('add-book-rating');
     rating.min = 0;
     rating.max = 10;
+    rating.style.display = 'inline';
 
     const locationsHolder = document.createElement('select');
     user.locations.forEach(l => {
@@ -251,6 +252,23 @@ function loadBookPage(title, authors, description, language, categories, image, 
         optionDiv.value = opt;
 
         readStatusSelect.appendChild(optionDiv);
+    })
+
+    let noRating;
+
+    readStatusSelect.addEventListener('change', () => {
+        console.log('this is firing off')
+        if(readStatusSelect.value === 'Unread'){
+            rating.style.display = 'none';
+            noRating = true;
+        } else {
+            rating.style.display = 'inline';
+            noRating = false;
+        }
+
+        console.log(noRating);
+        console.log(rating.style.display);
+        console.log(rating.value);
     })
 
     const numberOfCopies = document.createElement('input');
@@ -274,6 +292,8 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookDialog.appendChild(saveBookBtn);
 
     saveBookBtn.addEventListener('click', () => {
+        const ratingValue = noRating ? null : rating.value;
+
         addBook({
             title: dialogTitle.value,
             cover: imageLink.value,
@@ -282,7 +302,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             language: language,
             identifiers: identifiers,
             id: id,
-            rating: rating.value,
+            rating: ratingValue,
             readStatus: readStatusSelect.value,
             publishedDate: publishedDate,
             dateAdded: new Date().toISOString(),
@@ -558,6 +578,13 @@ function displayView(select){
     else if(select === 'List View') displayListView();
 }
 
+function getRatingColour(rating){
+    if(rating <= 4) {return ['red', 'white']}
+    else if(rating <= 6) {return ['orange', 'white']}
+    else if(rating <= 10) {return ['green', 'white']}
+    else if(rating === 10) {return ['darkgreen', 'white']}
+}
+
 function displayGridView(){
     booksHolder.innerHTML = '';
 
@@ -580,10 +607,18 @@ function displayGridView(){
         removeBookBtn.innerText = 'x';
         removeBookBtn.classList.add('grid-view-remove-btn');
 
-        const ratingDiv = document.createElement('div');
-        ratingDiv.classList.add('book-rating');
-        ratingDiv.innerText = b.rating;
+        if(b.rating){
+            const ratingDiv = document.createElement('div');
+            ratingDiv.classList.add('book-rating');
+            ratingDiv.innerText = b.rating;
+            book.appendChild(ratingDiv);
 
+            const ratingColors = getRatingColour(b.rating);
+
+            ratingDiv.style.backgroundColor = ratingColors[0];
+            ratingDiv.style.color = ratingColors[1];
+        }
+        
         const readStatus = document.createElement('div');
         if(!b.readStatus){
             b.readStatus = 'Unread'
@@ -597,7 +632,6 @@ function displayGridView(){
         book.appendChild(cover);
         book.appendChild(title);
         book.appendChild(readStatus);
-        book.appendChild(ratingDiv);
         book.appendChild(removeBookBtn);
 
         gridViewContainer.appendChild(book);
@@ -626,9 +660,19 @@ function displayListView(){
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
 
-        const ratingDiv = document.createElement('div');
-        ratingDiv.classList.add('book-rating');
-        ratingDiv.innerText = b.rating;
+        if(b.rating){
+            const ratingDiv = document.createElement('div');
+            ratingDiv.classList.add('list-book-rating');
+            ratingDiv.innerText = b.rating;
+
+            const ratingColors = getRatingColour(b.rating);
+
+            ratingDiv.style.backgroundColor = ratingColors[0];
+            ratingDiv.style.color = ratingColors[1];
+
+            book.appendChild(ratingDiv);
+        }
+        
 
         const readStatus = document.createElement('div');
         if(!b.readStatus){
@@ -643,7 +687,6 @@ function displayListView(){
         book.appendChild(cover);
         book.appendChild(title);
         book.appendChild(readStatus);
-        book.appendChild(ratingDiv);
         book.appendChild(removeBookBtn);
 
         listViewContainer.appendChild(book);
@@ -690,11 +733,6 @@ function fillGenreOptions(){
     });
 }
 
-function resetFilters(){
-    filteredBooks = [...user.books]
-    displayMyBooks()
-}
-
 function filterBooks(){
     filteredBooks = [...user.books];
 
@@ -738,5 +776,7 @@ function removeLocation(location, dialog){
     closeDialog(dialog)
     generateLibraryPage()
 }
+
+
 
 generateLibraryPage();
