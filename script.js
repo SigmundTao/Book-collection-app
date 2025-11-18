@@ -14,16 +14,11 @@ let readSelect;
 
 const readingSatuses = ['Read', 'Reading', 'Unread'];
 
-
-searchBtn.addEventListener('click', () => {
-    searchBook()
-})
-
 const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], locations: ['Physical Copy', 'Kindle']} 
 
 let filteredBooks = [...user.books];
 
-async function searchBook(){
+async function searchBook(searchBar){
     const bookTitle = searchBar.value;
     const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
 
@@ -509,9 +504,34 @@ function generateLibraryPage(){
 
     addNewLocationBtn.addEventListener('click', () => {openDialog(newLocationDialog)})
 
+    const addNewBookBtn = document.createElement('button');
+    addNewBookBtn.innerText = '+';
+    addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
+
+    libraryPage.appendChild(addNewBookBtn);
+
     fillGenreOptions();
     sortSelect.value = 'A-Z';
     sortBooks('A-Z');
+}
+
+function loadSearchPage(){
+    pageHolder.innerHTML = '';
+    const searchPage = document.createElement('div');
+
+    const searchBar = document.createElement('input');
+    
+    const searchButton = document.createElement('button');
+    searchButton.innerText = 'Search';
+
+    searchPage.appendChild(searchBar);
+    searchPage.appendChild(searchButton);
+
+    pageHolder.appendChild(searchPage);
+
+    searchButton.addEventListener('click', () => {
+        searchBook(searchBar);
+    })
 }
 
 function displayMyBooks(){
