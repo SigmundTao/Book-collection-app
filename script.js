@@ -208,6 +208,9 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookDialog.id = 'add-book-dialog';
     bookPageContainer.appendChild(addBookDialog);
 
+    const titleLabel = document.createElement('h2');
+    titleLabel.innerText = 'Title:'
+
     const dialogTitle = document.createElement('input');
     dialogTitle.classList.add('add-book-dialog-title');
     dialogTitle.value = title;
@@ -215,11 +218,17 @@ function loadBookPage(title, authors, description, language, categories, image, 
     const dialogImage = document.createElement('div');
     dialogImage.classList.add('add-book-dialog-image');
 
+    const linkLabel = document.createElement('h3');
+    linkLabel.innerText = 'Photo URL:';
+
     const imageLink = document.createElement('input');
     imageLink.type = 'text';
     imageLink.value = image;
 
     dialogImage.style.backgroundImage = `url(${imageLink.value})`;
+
+    const ratingLabel = document.createElement('h2');
+    ratingLabel.innerText = 'Book Rating:'
 
     const rating = document.createElement('input');
     rating.classList.add('rating')
@@ -229,6 +238,9 @@ function loadBookPage(title, authors, description, language, categories, image, 
     rating.max = 10;
     rating.style.display = 'inline';
 
+    const locationsLabel = document.createElement('h2');
+    locationsLabel.innerText = 'Location:';
+
     const locationsHolder = document.createElement('select');
     user.locations.forEach(l => {
         const locationOption = document.createElement('option');
@@ -237,6 +249,9 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
         locationsHolder.appendChild(locationOption);
     })
+
+    const readLabel = document.createElement('h2');
+    readLabel.innerText = 'Read Status';
 
     const readStatusSelect = document.createElement('select');
     readStatusSelect.classList.add('read-status-select');
@@ -254,10 +269,12 @@ function loadBookPage(title, authors, description, language, categories, image, 
     readStatusSelect.addEventListener('change', () => {
         console.log('this is firing off')
         if(readStatusSelect.value === 'Unread'){
+            ratingLabel.style.display = 'none';
             rating.style.display = 'none';
             noRating = true;
         } else {
-            rating.style.display = 'inline';
+            rating.style.display = 'block';
+            ratingLabel.style.display = 'block';
             noRating = false;
         }
 
@@ -277,14 +294,21 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     const closeAddBookDialogBtn = document.createElement('button');
     closeAddBookDialogBtn.classList.add('close-add-book-dialog-btn');
+    closeAddBookDialogBtn.innerText = 'X';
 
+    addBookDialog.appendChild(titleLabel);
     addBookDialog.appendChild(dialogTitle);
     addBookDialog.appendChild(dialogImage);
+    addBookDialog.appendChild(linkLabel);
     addBookDialog.appendChild(imageLink);
+    addBookDialog.appendChild(ratingLabel);
     addBookDialog.appendChild(rating);
+    addBookDialog.appendChild(locationsLabel);
     addBookDialog.appendChild(locationsHolder);
+    addBookDialog.appendChild(readLabel);
     addBookDialog.appendChild(readStatusSelect);
     addBookDialog.appendChild(saveBookBtn);
+    addBookDialog.appendChild(closeAddBookDialogBtn);
 
     saveBookBtn.addEventListener('click', () => {
         const ratingValue = noRating ? null : rating.value;
@@ -505,6 +529,7 @@ function generateLibraryPage(){
     addNewLocationBtn.addEventListener('click', () => {openDialog(newLocationDialog)})
 
     const addNewBookBtn = document.createElement('button');
+    addNewBookBtn.classList.add('add-new-book-btn');
     addNewBookBtn.innerText = '+';
     addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
 
@@ -531,6 +556,13 @@ function loadSearchPage(){
 
     searchButton.addEventListener('click', () => {
         searchBook(searchBar);
+    })
+
+    searchBar.addEventListener('keydown', (event) => {
+        console.log(event.key)
+        if(event.key === 'Enter'){
+            searchBook(searchBar);
+        }
     })
 }
 

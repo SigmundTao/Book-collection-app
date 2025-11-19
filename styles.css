@@ -176,3 +176,21 @@ body {
     justify-content: flex-start;
     flex-direction: column;
 }
+
+.add-new-book-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    height: 7vh;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 3rem;
+}
+
+.add-new-book-btn:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
