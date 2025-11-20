@@ -14,7 +14,7 @@ let readSelect;
 
 const readingSatuses = ['Read', 'Reading', 'Unread'];
 
-const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], locations: ['Physical Copy', 'Kindle']} 
+const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], locations: ['Bookshelf', 'Kindle'], wishlist: []} 
 
 let filteredBooks = [...user.books];
 
@@ -196,6 +196,23 @@ function loadBookPage(title, authors, description, language, categories, image, 
         div.appendChild(id);
 
         identifiersHolder.appendChild(div);
+    })
+
+    const addToWishListBtn = document.createElement('button');
+    addToWishListBtn.innerText = 'W';
+    leftSideHolder.appendChild(addToWishListBtn);
+
+    addToWishListBtn.addEventListener('click', () => {
+        addToWishlist({
+            title: dialogTitle.value,
+            cover: imageLink.value,
+            categories: categories,
+            description: description,
+            language: language,
+            identifiers: identifiers,
+            id: id,
+            publishedDate: publishedDate,
+    })
     })
 
     const addBookBtn = document.createElement('button');
@@ -535,9 +552,86 @@ function generateLibraryPage(){
 
     libraryPage.appendChild(addNewBookBtn);
 
+    const openWishlistBtn = document.createElement('button');
+    openWishlistBtn.classList.add('open-wish-list-button');
+    openWishlistBtn.innerText = 'W';
+
+    openWishlistBtn.addEventListener('click', generateWishListPage)
+
+    libraryPage.appendChild(openWishlistBtn);
+
     fillGenreOptions();
     sortSelect.value = 'A-Z';
     sortBooks('A-Z');
+}
+
+function addToWishlist(book){
+    if(user.wishlist.findIndex(e => e.id === book.id) === -1){
+        user.wishlist.push(book)
+    }
+
+    updateUserData()
+}
+
+function generateWishListPage(){
+    pageHolder.innerHTML = '';
+
+    const wishListPage = document.createElement('div');
+    wishListPage.classList.id = 'wish-list-page';
+
+    const title = document.createElement('h1');
+    title.innerText = 'Wishlist';
+
+    const bookHolder = document.createElement('div');
+    bookHolder.classList.add('wish-list-book-holder');
+
+    const closeWishListBtn = document.createElement('button');
+    closeWishListBtn.innerText = 'X';
+
+    wishListPage.appendChild(title);
+    wishListPage.appendChild(bookHolder);
+    wishListPage.appendChild(closeWishListBtn);
+
+    pageHolder.appendChild(wishListPage);
+
+    closeWishListBtn.addEventListener('click', generateLibraryPage);
+
+    //Wishlist book creation
+    user.wishlist.forEach(b => {
+        const book = createBook(b);
+        bookHolder.appendChild(book);
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerText = 'X';
+
+        removeBtn.addEventListener('click', () => {
+            user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
+            updateUserData()
+            generateWishListPage()
+        })
+
+        book.appendChild(removeBtn);
+    })
+
+    console.log(user.wishlist);
+}
+
+function createBook(b){
+    const book = document.createElement('div');
+    book.classList.add('book');
+    
+    const title = document.createElement('h3');
+    title.classList.add('book-title');
+    title.innerText = b.title;
+    
+    const img = document.createElement('img');
+    img.src = b.cover;
+    img.alt = b.title;
+    
+    book.appendChild(title);
+    book.appendChild(img);
+    
+    return book;
 }
 
 function loadSearchPage(){
@@ -944,7 +1038,5 @@ function removeLocation(location, dialog){
     closeDialog(dialog)
     generateLibraryPage()
 }
-
-
 
 generateLibraryPage();

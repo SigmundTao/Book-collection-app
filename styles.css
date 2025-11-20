@@ -194,3 +194,21 @@ body {
     cursor: pointer;
     transform: scale(1.1);
 }
+
+.open-wish-list-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    height: 7vh;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: none;
+    background-color: black;
+    color: white;
+    font-size: 3rem;
+}
+
+.open-wish-list-button:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
