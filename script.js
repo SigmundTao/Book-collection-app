@@ -204,8 +204,8 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     addToWishListBtn.addEventListener('click', () => {
         addToWishlist({
-            title: dialogTitle.value,
-            cover: imageLink.value,
+            title: title,
+            cover: image,
             categories: categories,
             description: description,
             language: language,
@@ -552,9 +552,13 @@ function generateLibraryPage(){
 
     libraryPage.appendChild(addNewBookBtn);
 
-    const openWishlistBtn = document.createElement('button');
+    const openWishlistBtn = document.createElement('div');
     openWishlistBtn.classList.add('open-wish-list-button');
-    openWishlistBtn.innerText = 'W';
+
+    const heartImage = document.createElement('div');
+    heartImage.classList.add('heart-img');
+    heartImage.style.backgroundImage = `url('./heart.svg')`;
+    openWishlistBtn.appendChild(heartImage);
 
     openWishlistBtn.addEventListener('click', generateWishListPage)
 
@@ -566,7 +570,9 @@ function generateLibraryPage(){
 }
 
 function addToWishlist(book){
-    if(user.wishlist.findIndex(e => e.id === book.id) === -1){
+    if(user.books.findIndex(e => e.id === book.id) !== -1){
+        alert('You already own this book!');
+    }else if(user.wishlist.findIndex(e => e.id === book.id) === -1){
         user.wishlist.push(book)
     }
 

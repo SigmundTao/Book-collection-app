@@ -206,9 +206,21 @@ body {
     background-color: black;
     color: white;
     font-size: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5vh;
 }
 
 .open-wish-list-button:hover {
     cursor: pointer;
     transform: scale(1.1);
+}
+
+.heart-img {
+    height: 100%;
+    width: 100%;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
