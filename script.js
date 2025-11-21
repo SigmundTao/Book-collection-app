@@ -28,7 +28,7 @@ async function searchBook(searchBar){
 }
 
 function displaySearchResults(data){
-    console.log(data)
+    pageHolder.innerHTML = '';
     if (!searchResultsContainer) {
         searchResultsContainer = document.createElement('div');
         searchResultsContainer.classList.add('search-results-container');
@@ -37,6 +37,7 @@ function displaySearchResults(data){
     }
     
     searchResultsContainer.innerHTML = '';
+    pageHolder.appendChild(searchResultsContainer);
 
     data.items.forEach(book => {
         const bookTitle = book.volumeInfo.title || 'No title';
