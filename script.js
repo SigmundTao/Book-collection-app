@@ -343,7 +343,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             readStatus: readStatusSelect.value,
             publishedDate: publishedDate,
             dateAdded: new Date().toISOString(),
-            location: 'Physical Copy',
+            location: locationsHolder.value,
         })
 
         closeDialog(addBookDialog);
