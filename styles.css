@@ -224,3 +224,15 @@ body {
     background-size: contain;
     background-repeat: no-repeat;
 }
+
+.selected-location {
+    border: 1px solid red;
+}
+
+.location-div {
+    height: 5vh;
+}
+
+.location-div {
+    cursor: pointer;
+}

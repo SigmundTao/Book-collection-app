@@ -385,6 +385,102 @@ function addBook(bookObj){
     }
 }
 
+/*
+addBook({
+            title: dialogTitle.value,
+            cover: imageLink.value,
+            categories: categories,
+            description: description,
+            language: language,
+            identifiers: identifiers,
+            id: id,
+            rating: ratingValue,
+            readStatus: readStatusSelect.value,
+            publishedDate: publishedDate,
+            dateAdded: new Date().toISOString(),
+            location: locationsHolder.value,
+            authors: authors
+        })
+*/
+
+function manuallyAddBook(){
+    const manualAddBookPage = document.createElement('div');
+
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+
+    const coverDisplay = document.createElement('div');
+    
+    const imageLinkInput = document.createElement('input');
+    imageLinkInput.type = 'text';
+
+    const genreHolders = document.createElement('div');
+
+    const description = document.createElement('input');
+    description.type = 'textarea';
+
+    const rating = document.createElement('input');
+    rating.value = null;
+    rating.type = number;
+    rating.min = 1;
+    rating.max = 0;
+
+    const readStatus = document.createElement('select');
+    readingSatuses.forEach(status => {
+        const statusOption = document.createElement('option');
+        statusOption.innerText = status;
+        statusOption.value = status;
+
+        readStatus.appendChild(statusOption);
+    })
+
+    readStatus.value = 'Read';
+
+    readStatus.addEventListener('change', () => {
+        if(readStatus.value !== 'Read'){
+            readStatus.display = 'none';
+        } else {
+            readStatus.display = 'block';
+        }
+    })
+
+    const publishedDate = document.createElement('input');
+    publishedDate.type = 'date';
+
+    const locationsSelect = createLocationSelect();
+    
+    
+}
+
+function generateBookId(){
+    let id = Math.random().toString(36).substring(2, 8);
+    if(user.books.findIndex(e => e.id === id) !== -1){
+        id += `${(Math.random() * 100) * (Math.random() * 100)}`
+    }
+
+    return id;
+}
+
+function createLocationSelect(){
+    const locationsHolder = document.createElement('div');
+
+    user.locations.forEach(l => {
+        const locationDiv = document.createElement('div');
+        locationDiv.classList.add('location-div');
+        locationDiv.innerText = l;
+        location.value = l;
+        locationsHolder.appendChild(locationDiv);
+
+        locationDiv.addEventListener('click', () => {
+            document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
+            locationDiv.classList.add('selected-location');
+            filterBooks();
+        })
+    })
+
+    return locationsHolder;
+}
+
 function generateLibraryPage(){
     pageHolder.innerHTML = '';
     
@@ -458,31 +554,21 @@ function generateLibraryPage(){
 
     const locationContainer = document.createElement('div');
     filterBar.appendChild(locationContainer);
-    locationSelect = document.createElement('select');
-    locationSelect.classList.add('location-select');
+    locationSelect = createLocationSelect()
     locationContainer.appendChild(locationSelect)
 
-    const defaultLocation = document.createElement('option');
+    const defaultLocation = document.createElement('div');
+    defaultLocation.classList.add('location-div');
+    defaultLocation.classList.add('selected-location');
     defaultLocation.value = 'All Locations';
     defaultLocation.innerText = 'All Locations';
     locationSelect.appendChild(defaultLocation);
-
-    user.locations.forEach(l => {
-        const location = document.createElement('option');
-        location.value = l;
-        location.innerText = l;
-
-        locationSelect.appendChild(location);
-
-        const locationCard = document.createElement('div');
-        locationCard.innerText = l;
-        locationCard.classList.add('location-card')
-        removeLocationDialog.appendChild(locationCard);
-
-        locationCard.addEventListener('click', () => {
-            removeLocation(locationCard.innerText, removeLocationDialog);
-        })
+    defaultLocation.addEventListener('click', () => {
+            document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
+            defaultLocation.classList.add('selected-location');
+            filterBooks();
     })
+
 
     const addNewLocationBtn = document.createElement('button');
     addNewLocationBtn.innerText = 'add new location'
@@ -519,8 +605,7 @@ function generateLibraryPage(){
         filterBooks();
     })
 
-    locationSelect.addEventListener('change', () => {
-        filterBooks();
+    locationSelect.addEventListener('click', () => {
     });
 
     const newLocationDialog = document.createElement('dialog');
@@ -1023,7 +1108,7 @@ function filterBooks(){
         filteredBooks = filteredBooks.filter(b => b.categories.includes(selectedGenre));
     }
     
-    const selectedLocation = locationSelect.value;
+    const selectedLocation = document.querySelector('.selected-location').innerText;
     if(selectedLocation !== 'All Locations'){
         filteredBooks = filteredBooks.filter(b => b.location === selectedLocation);
     }
