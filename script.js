@@ -890,6 +890,9 @@ function openEditDialog(book, container){
     editBookLink.type = Text;
     editBookLink.value = book.cover;
 
+    const locationsDiv = document.createElement('div');
+    createSelectableLocations(locationsDiv, book);
+
     const readingStatusTitle = document.createElement('h3');
     readingStatusTitle.innerText = 'Read Status:'
 
@@ -921,6 +924,7 @@ function openEditDialog(book, container){
     dialogDiv.appendChild(editBookPhoto);
     dialogDiv.appendChild(link);
     dialogDiv.appendChild(editBookLink);
+    dialogDiv.appendChild(locationsDiv);
     dialogDiv.appendChild(undreadOrReadSelect);
     dialogDiv.appendChild(bookRatingTitle);
     dialogDiv.appendChild(editBookRating);
@@ -958,6 +962,7 @@ function openEditDialog(book, container){
         user.books[bookIndex].readStatus = undreadOrReadSelect.value;
         user.books[bookIndex].cover = editBookLink.value;
         user.books[bookIndex].title = editBookTitle.value;
+        user.books[bookIndex].location = document.querySelector('.selected-change-location').innerText
         
         updateUserData()
         closeDialog(editBookDialog);
@@ -1194,5 +1199,27 @@ dialogs.forEach(d => {
         }
     });
 })
+
+function createSelectableLocations(locationsDiv, book){
+    const bookIndex = user.books.findIndex(b => b.id === book.id);
+
+    user.locations.forEach(l => {
+        const locationDiv = document.createElement('div');
+        locationDiv.classList.add('change-location');
+        if(l === user.books[bookIndex].location){
+            locationDiv.classList.add('selected-change-location');
+        }
+        locationDiv.innerText = l;
+
+        locationDiv.addEventListener('click', () => {
+            document.querySelectorAll('.change-location').forEach(element => {
+                element.classList.remove('selected-change-location');
+            });
+            locationDiv.classList.add('selected-change-location');
+        })
+
+        locationsDiv.appendChild(locationDiv);
+    })
+}
 
 generateLibraryPage();

@@ -236,3 +236,7 @@ body {
 .location-div {
     cursor: pointer;
 }
+
+.selected-change-location {
+    border: 1px solid red;
+}
