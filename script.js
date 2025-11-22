@@ -11,6 +11,7 @@ let booksHolder;
 let searchResultsContainer;
 let locationSelect;
 let readSelect;
+let genres = ['Philosophy', 'Fiction'];
 
 const readingSatuses = ['Read', 'Reading', 'Unread'];
 
@@ -385,23 +386,16 @@ function addBook(bookObj){
     }
 }
 
-/*
-addBook({
-            title: dialogTitle.value,
-            cover: imageLink.value,
-            categories: categories,
-            description: description,
-            language: language,
-            identifiers: identifiers,
-            id: id,
-            rating: ratingValue,
-            readStatus: readStatusSelect.value,
-            publishedDate: publishedDate,
-            dateAdded: new Date().toISOString(),
-            location: locationsHolder.value,
-            authors: authors
-        })
-*/
+function createGenreCard(genre){
+    const genreCard = document.createElement('div');
+    genreCard.classList.add('genreCard');
+
+    genreCard.addEventListener('click', () => {
+        genreCard.classList.toggle('selected-genre');
+    })
+
+    genreCard.innerText = genre;
+}
 
 function manuallyAddBook(){
     const manualAddBookPage = document.createElement('div');
@@ -415,6 +409,10 @@ function manuallyAddBook(){
     imageLinkInput.type = 'text';
 
     const genreHolders = document.createElement('div');
+    
+    genres.forEach(genre => {
+       genreHolders.appendChild(createGenreCard(genre));
+    })
 
     const description = document.createElement('input');
     description.type = 'textarea';
@@ -444,12 +442,44 @@ function manuallyAddBook(){
         }
     })
 
-    const publishedDate = document.createElement('input');
-    publishedDate.type = 'date';
-
     const locationsSelect = createLocationSelect();
-    
-    
+    locationSelect.classList.add('manual-location-select');
+
+    const id = generateBookId();
+
+    const languageInput = document.createElement('input');
+    languageInput.type = 'text';
+
+    const saveBookBtn = document.createElement('div');
+
+    manualAddBookPage.appendChild(titleInput);
+    manualAddBookPage.appendChild(coverDisplay);
+    manualAddBookPage.appendChild(imageLinkInput);
+
+    let selectedGenres = [];
+
+    saveBookBtn.addEventListener('click', () => {
+        selectedGenres = [];
+        document.querySelectorAll('.selected-genre').forEach(g => {
+            selectedGenres.push(g.innerText);
+        })
+
+        addBook({
+            title: titleInput.value,
+            cover: imageLinkInput.value,
+            categories: selectedGenres,
+            description: description.value,
+            language: languageInput,
+            identifiers: identifiers,
+            id: id,
+            rating: rating.value,
+            readStatus: readStatusSelect.value,
+            publishedDate: publishedDate,
+            dateAdded: new Date().toISOString(),
+            location: df,
+            authors: authors
+        })
+    })
 }
 
 function generateBookId(){
@@ -555,8 +585,10 @@ function generateLibraryPage(){
     libraryPage.appendChild(removeLocationDialog);
 
     const locationContainer = document.createElement('div');
+    locationContainer.classList.add('location-container');
     filterBar.appendChild(locationContainer);
     locationSelect = createLocationSelect()
+    locationSelect.classList.add('location-select');
     locationContainer.appendChild(locationSelect)
 
     const defaultLocation = document.createElement('div');
@@ -570,7 +602,6 @@ function generateLibraryPage(){
             defaultLocation.classList.add('selected-location');
             filterBooks();
     })
-
 
     const addNewLocationBtn = document.createElement('button');
     addNewLocationBtn.innerText = 'add new location'
@@ -721,6 +752,7 @@ function generateWishListPage(){
     bookHolder.classList.add('wish-list-book-holder');
 
     const closeWishListBtn = document.createElement('button');
+    closeWishListBtn.classList.add('close-wishlist-btn');
     closeWishListBtn.innerText = 'X';
 
     wishListPage.appendChild(title);
@@ -747,6 +779,13 @@ function generateWishListPage(){
 
         book.appendChild(removeBtn);
     })
+
+    const addNewBookBtn = document.createElement('button');
+    addNewBookBtn.classList.add('add-new-book-btn');
+    addNewBookBtn.innerText = '+';
+    addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
+
+    wishListPage.appendChild(addNewBookBtn);
 
     console.log(user.wishlist);
 }
