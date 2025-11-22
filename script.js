@@ -213,6 +213,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             identifiers: identifiers,
             id: id,
             publishedDate: publishedDate,
+            authors: authors,
     })
     })
 
@@ -344,6 +345,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
             publishedDate: publishedDate,
             dateAdded: new Date().toISOString(),
             location: locationsHolder.value,
+            authors: authors
         })
 
         closeDialog(addBookDialog);
@@ -865,6 +867,16 @@ function displayGridView(){
         const title = document.createElement('h3');
         title.innerText = b.title;
         title.classList.add('grid-view-title');
+        
+        const authorsHolder = document.createElement('h4');
+        if(b.authors.length <= 0){
+
+        } else {
+            b.authors.forEach(author => {
+            authorsHolder.innerText += `${author} `;
+            })
+        }
+        
 
         const editBookBtn = document.createElement('button');
         editBookBtn.innerText = 'edit';
@@ -899,6 +911,7 @@ function displayGridView(){
 
         book.appendChild(cover);
         book.appendChild(title);
+        book.appendChild(authorsHolder);
         book.appendChild(readStatus);
         book.appendChild(removeBookBtn);
         book.appendChild(editBookBtn);
