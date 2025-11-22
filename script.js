@@ -550,6 +550,8 @@ function generateLibraryPage(){
     filterBar.appendChild(readSelect);
 
     const removeLocationDialog = document.createElement('dialog');
+    generateRemoveLocations(removeLocationDialog);
+
     libraryPage.appendChild(removeLocationDialog);
 
     const locationContainer = document.createElement('div');
@@ -655,6 +657,45 @@ function generateLibraryPage(){
     fillGenreOptions();
     sortSelect.value = 'A-Z';
     sortBooks('A-Z');
+}
+
+function generateRemoveLocations(removeLocationDialog){
+    removeLocationDialog.innerHTML = '';
+
+    const removeTitle = document.createElement('h2');
+    removeTitle.innerText = 'Remove Locations:';
+
+    removeLocationDialog.appendChild(removeTitle);
+
+    user.locations.forEach(l => {
+        const removeLocationCard = document.createElement('div');
+        
+        const locationTitle = document.createElement('h3');
+        locationTitle.innerText = l;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerText = 'X';
+
+        removeLocationCard.appendChild(locationTitle);
+        removeLocationCard.appendChild(removeBtn);
+
+        removeLocationDialog.appendChild(removeLocationCard);
+
+        removeBtn.addEventListener('click', () => {
+            user.locations.splice(user.locations.findIndex(e => e === l), 1);
+            updateUserData();
+            generateRemoveLocations(removeLocationDialog);
+        })
+    })
+
+    const closeBtn = document.createElement('button');
+    closeBtn.innerText = 'close dialog';
+    closeBtn.addEventListener('click', () => {
+        closeDialog(removeLocationDialog);
+        generateLibraryPage()
+    })
+
+    removeLocationDialog.appendChild(closeBtn);
 }
 
 function addToWishlist(book){
@@ -1143,5 +1184,15 @@ function removeLocation(location, dialog){
     closeDialog(dialog)
     generateLibraryPage()
 }
+
+//Make all dialogs closable with Esc
+const dialogs = document.querySelectorAll('dialog')
+dialogs.forEach(d => {
+    d.addEventListener('keydown', (event) => {
+        if(event.key === 'Escape'){
+            closeDialog(d);
+        }
+    });
+})
 
 generateLibraryPage();
