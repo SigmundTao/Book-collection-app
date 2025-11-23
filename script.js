@@ -768,6 +768,20 @@ function generateWishListPage(){
         const book = createBook(b);
         bookHolder.appendChild(book);
 
+        const addToLibraryBtn = document.createElement('button');
+        addToLibraryBtn.innerText = '+';
+
+        book.appendChild(addToLibraryBtn);
+
+        addToLibraryBtn.addEventListener('click', () => {
+            user.books.push(b);
+            user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
+            console.log(user.wishList);
+            console.log(user.books);
+            updateUserData()
+            generateWishListPage()
+        })
+
         const removeBtn = document.createElement('button');
         removeBtn.innerText = 'X';
 
