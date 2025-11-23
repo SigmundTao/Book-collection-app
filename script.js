@@ -531,7 +531,7 @@ function manuallyAddBook(){
             rating: rating.value,
             readStatus: readStatus.value,
             dateAdded: new Date().toISOString(),
-            location: document.querySelector('.selected-location'),
+            location: document.querySelector('.selected-location').innerText,
             authors: [authorInput.value],
         })
     })
