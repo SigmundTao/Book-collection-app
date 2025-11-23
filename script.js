@@ -395,33 +395,60 @@ function createGenreCard(genre){
     })
 
     genreCard.innerText = genre;
+
+    return genreCard;
 }
 
 function manuallyAddBook(){
+    pageHolder.innerHTML = '';
     const manualAddBookPage = document.createElement('div');
+
+    const title = document.createElement('h3');
+    title.innerText = 'Title:';
 
     const titleInput = document.createElement('input');
     titleInput.type = 'text';
 
+    const authorTitle = document.createElement('h3');
+    authorTitle.innerText = 'Author:'
+
+    const authorInput = document.createElement('input');
+    authorInput.type = 'text';
+
     const coverDisplay = document.createElement('div');
     
+    const imageLinkTitle = document.createElement('h3');
+    imageLinkTitle.innerText = 'Image Link:';
+
     const imageLinkInput = document.createElement('input');
     imageLinkInput.type = 'text';
 
-    const genreHolders = document.createElement('div');
+    const genreTitle = document.createElement('h3');
+    genreTitle.innerText = 'Catergories';
+
+    const genreHolder = document.createElement('div');
     
     genres.forEach(genre => {
-       genreHolders.appendChild(createGenreCard(genre));
+        const genreCard = createGenreCard(genre)
+        genreHolder.appendChild(genreCard);
     })
 
-    const description = document.createElement('input');
-    description.type = 'textarea';
+    const descriptionTitle = document.createElement('h3');
+    descriptionTitle.innerText = 'Description:';
+
+    const description = document.createElement('textarea');
+
+    const ratingTitle = document.createElement('h3');
+    ratingTitle.innerText = 'Rating:'
 
     const rating = document.createElement('input');
     rating.value = null;
-    rating.type = number;
+    rating.type = 'number';
     rating.min = 1;
     rating.max = 0;
+
+    const readStatusTitle = document.createElement('h3');
+    readStatusTitle.innerText = 'Read Status:';
 
     const readStatus = document.createElement('select');
     readingSatuses.forEach(status => {
@@ -442,19 +469,49 @@ function manuallyAddBook(){
         }
     })
 
+    const locationTitle = document.createElement('h3');
+    locationTitle.innerText = 'Book Location:';
+
     const locationsSelect = createLocationSelect();
     locationSelect.classList.add('manual-location-select');
 
     const id = generateBookId();
 
+    const langInputTitle = document.createElement('h3');
+    langInputTitle.innerText = 'Language:';
+
     const languageInput = document.createElement('input');
     languageInput.type = 'text';
 
-    const saveBookBtn = document.createElement('div');
+    const saveBookBtn = document.createElement('button');
+    saveBookBtn.innerText = 'Save';
 
     manualAddBookPage.appendChild(titleInput);
     manualAddBookPage.appendChild(coverDisplay);
     manualAddBookPage.appendChild(imageLinkInput);
+
+    manualAddBookPage.appendChild(title);
+    manualAddBookPage.appendChild(titleInput);
+    manualAddBookPage.appendChild(authorTitle);
+    manualAddBookPage.appendChild(authorInput);
+    manualAddBookPage.appendChild(coverDisplay);
+    manualAddBookPage.appendChild(imageLinkTitle);
+    manualAddBookPage.appendChild(imageLinkInput);
+    manualAddBookPage.appendChild(genreTitle);
+    manualAddBookPage.appendChild(genreHolder);
+    manualAddBookPage.appendChild(descriptionTitle);
+    manualAddBookPage.appendChild(description);
+    manualAddBookPage.appendChild(readStatusTitle);
+    manualAddBookPage.appendChild(readStatus);
+    manualAddBookPage.appendChild(ratingTitle);
+    manualAddBookPage.appendChild(rating);
+    manualAddBookPage.appendChild(locationTitle);
+    manualAddBookPage.appendChild(locationsSelect);
+    manualAddBookPage.appendChild(langInputTitle);
+    manualAddBookPage.appendChild(languageInput);
+    manualAddBookPage.appendChild(saveBookBtn);
+
+    pageHolder.appendChild(manualAddBookPage);
 
     let selectedGenres = [];
 
@@ -470,14 +527,12 @@ function manuallyAddBook(){
             categories: selectedGenres,
             description: description.value,
             language: languageInput,
-            identifiers: identifiers,
             id: id,
             rating: rating.value,
-            readStatus: readStatusSelect.value,
-            publishedDate: publishedDate,
+            readStatus: readStatus.value,
             dateAdded: new Date().toISOString(),
-            location: df,
-            authors: authors
+            location: document.querySelector('.selected-location'),
+            authors: [authorInput.value],
         })
     })
 }
@@ -831,8 +886,12 @@ function loadSearchPage(){
     const searchButton = document.createElement('button');
     searchButton.innerText = 'Search';
 
+    const addManuallyBtn = document.createElement('button');
+    addManuallyBtn.innerText = '+';
+
     searchPage.appendChild(searchBar);
     searchPage.appendChild(searchButton);
+    searchPage.appendChild(addManuallyBtn);
 
     pageHolder.appendChild(searchPage);
 
@@ -845,6 +904,10 @@ function loadSearchPage(){
         if(event.key === 'Enter'){
             searchBook(searchBar);
         }
+    })
+
+    addManuallyBtn.addEventListener('click', () => {
+        manuallyAddBook()
     })
 }
 
