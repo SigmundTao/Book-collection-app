@@ -473,7 +473,7 @@ function manuallyAddBook(){
     locationTitle.innerText = 'Book Location:';
 
     const locationsSelect = createLocationSelect();
-    locationSelect.classList.add('manual-location-select');
+    locationsSelect.classList.add('manual-location-select');
 
     const id = generateBookId();
 
@@ -526,7 +526,7 @@ function manuallyAddBook(){
             cover: imageLinkInput.value,
             categories: selectedGenres,
             description: description.value,
-            language: languageInput,
+            language: languageInput.value,
             id: id,
             rating: rating.value,
             readStatus: readStatus.value,
@@ -553,7 +553,7 @@ function createLocationSelect(){
         const locationDiv = document.createElement('div');
         locationDiv.classList.add('location-div');
         locationDiv.innerText = l;
-        location.value = l;
+        locationDiv.value = l;
         locationsHolder.appendChild(locationDiv);
 
         locationDiv.addEventListener('click', () => {
