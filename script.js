@@ -19,6 +19,20 @@ const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [],
 
 let filteredBooks = [...user.books];
 
+function createLabel(text, tag = 'h3'){
+    const label = document.createElement(tag);
+    label.innerText = text;
+    return label;
+}
+
+function createInput(type = 'text', value = ''){
+    const input = document.createElement('input');
+    input.type = type;
+    input.value = value
+
+    return input;
+}
+
 async function searchBook(searchBar){
     const bookTitle = searchBar.value;
     const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
@@ -228,27 +242,20 @@ function loadBookPage(title, authors, description, language, categories, image, 
     addBookDialog.id = 'add-book-dialog';
     bookPageContainer.appendChild(addBookDialog);
 
-    const titleLabel = document.createElement('h2');
-    titleLabel.innerText = 'Title:'
+    const titleLabel = createLabel('Title:', 'h3');
 
-    const dialogTitle = document.createElement('input');
-    dialogTitle.classList.add('add-book-dialog-title');
-    dialogTitle.value = title;
+    const dialogTitle = createInput('text', title);
 
     const dialogImage = document.createElement('div');
     dialogImage.classList.add('add-book-dialog-image');
 
-    const linkLabel = document.createElement('h3');
-    linkLabel.innerText = 'Photo URL:';
+    const linkLabel = createLabel('Photo URL:', 'h3');
 
-    const imageLink = document.createElement('input');
-    imageLink.type = 'text';
-    imageLink.value = image;
+    const imageLink = createInput('text', image); 
 
     dialogImage.style.backgroundImage = `url(${imageLink.value})`;
 
-    const ratingLabel = document.createElement('h2');
-    ratingLabel.innerText = 'Book Rating:'
+    const ratingLabel = createLabel('BookRating', 'h3');
 
     const rating = document.createElement('input');
     rating.classList.add('rating')
@@ -258,8 +265,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
     rating.max = 10;
     rating.style.display = 'inline';
 
-    const locationsLabel = document.createElement('h2');
-    locationsLabel.innerText = 'Location:';
+    const locationsLabel = createLabel('Location:');
 
     const locationsHolder = document.createElement('select');
     user.locations.forEach(l => {
@@ -270,8 +276,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
         locationsHolder.appendChild(locationOption);
     })
 
-    const readLabel = document.createElement('h2');
-    readLabel.innerText = 'Read Status';
+    const readLabel = createLabel('Read Status', 'h3')
 
     const readStatusSelect = document.createElement('select');
     readStatusSelect.classList.add('read-status-select');
@@ -403,28 +408,18 @@ function manuallyAddBook(){
     pageHolder.innerHTML = '';
     const manualAddBookPage = document.createElement('div');
 
-    const title = document.createElement('h3');
-    title.innerText = 'Title:';
+    const title = createLabel('Title:', 'h3');
+    const titleInput = createLabel('input', '');
 
-    const titleInput = document.createElement('input');
-    titleInput.type = 'text';
-
-    const authorTitle = document.createElement('h3');
-    authorTitle.innerText = 'Author:'
-
-    const authorInput = document.createElement('input');
-    authorInput.type = 'text';
+    const authorTitle = createLabel('Author:', 'h3');
+    const authorInput = createInput('text', '');
 
     const coverDisplay = document.createElement('div');
     
-    const imageLinkTitle = document.createElement('h3');
-    imageLinkTitle.innerText = 'Image Link:';
+    const imageLinkTitle = createLabel('Image Link:', 'h3');
+    const imageLinkInput = createInput('text', '');
 
-    const imageLinkInput = document.createElement('input');
-    imageLinkInput.type = 'text';
-
-    const genreTitle = document.createElement('h3');
-    genreTitle.innerText = 'Catergories';
+    const genreTitle = createLabel('Categories', 'h3');
 
     const genreHolder = document.createElement('div');
     
@@ -433,22 +428,17 @@ function manuallyAddBook(){
         genreHolder.appendChild(genreCard);
     })
 
-    const descriptionTitle = document.createElement('h3');
-    descriptionTitle.innerText = 'Description:';
+    const descriptionTitle = createLabel('Description:', 'h3');
 
     const description = document.createElement('textarea');
 
-    const ratingTitle = document.createElement('h3');
-    ratingTitle.innerText = 'Rating:'
+    const ratingTitle = createLabel('Rating:', 'h3');;
 
-    const rating = document.createElement('input');
-    rating.value = null;
-    rating.type = 'number';
+    const rating = createInput('number', '');
     rating.min = 1;
     rating.max = 10;
 
-    const readStatusTitle = document.createElement('h3');
-    readStatusTitle.innerText = 'Read Status:';
+    const readStatusTitle = createLabel('Read Status:', 'h3');
 
     const readStatus = document.createElement('select');
     readingSatuses.forEach(status => {
@@ -469,19 +459,14 @@ function manuallyAddBook(){
         }
     })
 
-    const locationTitle = document.createElement('h3');
-    locationTitle.innerText = 'Book Location:';
-
+    const locationTitle = createLabel('Book Location:', 'h3');
     const locationsSelect = createLocationSelect();
     locationsSelect.classList.add('manual-location-select');
 
     const id = generateBookId();
 
-    const langInputTitle = document.createElement('h3');
-    langInputTitle.innerText = 'Language:';
-
-    const languageInput = document.createElement('input');
-    languageInput.type = 'text';
+    const langInputTitle = createLabel('Language:', 'h3');
+    const languageInput = createInput('text', '');
 
     const saveBookBtn = document.createElement('button');
     saveBookBtn.innerText = 'Save';
@@ -697,8 +682,7 @@ function generateLibraryPage(){
     const newLocationDialog = document.createElement('dialog');
     libraryPage.appendChild(newLocationDialog);
 
-    const locationInput = document.createElement('input');
-    locationInput.type = 'text';
+    const locationInput = createInput('text', '');
     newLocationDialog.appendChild(locationInput);
 
     const closeDialogBtn = document.createElement('button');
@@ -746,15 +730,14 @@ function generateLibraryPage(){
 function generateRemoveLocations(removeLocationDialog){
     removeLocationDialog.innerHTML = '';
 
-    const removeTitle = document.createElement('h2');
-    removeTitle.innerText = 'Remove Locations:';
+    const removeTitle = createLabel('Remove Location:', 'h2');
 
     removeLocationDialog.appendChild(removeTitle);
 
     user.locations.forEach(l => {
         const removeLocationCard = document.createElement('div');
         
-        const locationTitle = document.createElement('h3');
+        const locationTitle = createLabel(l, 'h3');
         locationTitle.innerText = l;
 
         const removeBtn = document.createElement('button');
@@ -801,8 +784,8 @@ function generateWishListPage(){
     const wishListPage = document.createElement('div');
     wishListPage.id = 'wish-list-page';
 
-    const title = document.createElement('h1');
-    title.innerText = 'Wishlist';
+    const title = createLabel('Wishlist', 'h1');
+
 
     const bookHolder = document.createElement('div');
     bookHolder.classList.add('wish-list-book-holder');
@@ -862,7 +845,7 @@ function createBook(b){
     const book = document.createElement('div');
     book.classList.add('book');
     
-    const title = document.createElement('h3');
+    const title = createLabel(b.title, 'h3');
     title.classList.add('book-title');
     title.innerText = b.title;
     
@@ -880,7 +863,7 @@ function loadSearchPage(){
     pageHolder.innerHTML = '';
     const searchPage = document.createElement('div');
 
-    const searchBar = document.createElement('input');
+    const searchBar = createInput('text');
     
     const searchButton = document.createElement('button');
     searchButton.innerText = 'Search';
@@ -988,28 +971,22 @@ function openEditDialog(book, container){
     dialogDiv.classList.add('dialog-div');
     editBookDialog.appendChild(dialogDiv);
 
-    const title = document.createElement('h3');
-    title.innerText = 'Title:';
+    const title = createLabel('Title:', 'h3');
 
-    const editBookTitle = document.createElement('input');
-    editBookTitle.type = 'text';
-    editBookTitle.value = book.title;
+    const editBookTitle = createInput('text', book.title)
 
     const editBookPhoto = document.createElement('div');
     editBookPhoto.style.backgroundImage = `url(${book.cover})`;
 
-    const link = document.createElement('h3');
-    link.innerText = 'Photo URL:'
+    const link = createLabel('Book URL:', 'h3');
 
-    const editBookLink = document.createElement('input');
-    editBookLink.type = 'text';
+    const editBookLink = createInput('text', book.cover);
     editBookLink.value = book.cover;
 
     const locationsDiv = document.createElement('div');
     createSelectableLocations(locationsDiv, book);
 
-    const readingStatusTitle = document.createElement('h3');
-    readingStatusTitle.innerText = 'Read Status:'
+    const readingStatusTitle = createLabel('Read Status:', 'h3');
 
     const undreadOrReadSelect = document.createElement('select');
 
@@ -1022,14 +999,11 @@ function openEditDialog(book, container){
 
     undreadOrReadSelect.value = book.readStatus;
 
-    const bookRatingTitle = document.createElement('h3');
-    bookRatingTitle.innerText = 'Rating:'
+    const bookRatingTitle = createLabel('Rating:', 'h3');
 
-    const editBookRating = document.createElement('input');
-    editBookRating.type = 'number';
+    const editBookRating = createInput('number', book.rating);
     editBookRating.max = 10;
     editBookRating.min = 1;
-    editBookRating.value = book.rating;
 
     const saveBtn = document.createElement('button');
     saveBtn.innerText = 'save';
@@ -1110,8 +1084,7 @@ function displayGridView(){
         cover.style.backgroundImage = `url(${b.cover})`;
         cover.classList.add('grid-view-cover');
         
-        const title = document.createElement('h3');
-        title.innerText = b.title;
+        const title = createLabel(b.title, 'h3')
         title.classList.add('grid-view-title');
         
         const authorsHolder = document.createElement('h4');
@@ -1180,8 +1153,7 @@ function displayListView(){
         cover.style.backgroundImage = `url(${b.cover})`;
         cover.classList.add('list-view-cover');
         
-        const title = document.createElement('h3');
-        title.innerText = b.title;
+        const title = createLabel(b.title, 'h3');
 
         const removeBookBtn = document.createElement('button');
         removeBookBtn.innerText = 'x';
