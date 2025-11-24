@@ -36,7 +36,7 @@ function createInput(type = 'text', value = ''){
 function createButton(text, className){
     const btn = document.createElement('button');
     btn.innerText = text;
-    btn.classList.add(className);
+    if(className) btn.classList.add(className);
 
     return btn;
 }
@@ -47,6 +47,12 @@ function createDiv(text, className){
     if(className) div.classList.add(className);
 
     return div;
+}
+
+function appendChildren(childArray, parent){
+    childArray.forEach(child => {
+        parent.appendChild(child);
+    })
 }
 
 async function searchBook(searchBar){
@@ -125,13 +131,17 @@ function displaySearchResults(data){
             identifiersHolder.appendChild(div);
         })
 
-        result.appendChild(resultImage);
-        result.appendChild(title);
-        result.appendChild(authorsHolder);
-        result.appendChild(descriptionHolder);
-        result.appendChild(languageHolder);
-        result.appendChild(categoriesHolder);
-        result.appendChild(identifiersHolder);
+        const children = [
+            resultImage,
+            title,
+            authorsHolder,
+            descriptionHolder,
+            languageHolder,
+            categoriesHolder,
+            identifiersHolder
+        ]
+
+        appendChildren(children, result);
 
         searchResultsContainer.appendChild(result);
     });
@@ -272,7 +282,6 @@ function loadBookPage(title, authors, description, language, categories, image, 
     let noRating;
 
     readStatusSelect.addEventListener('change', () => {
-        console.log('this is firing off')
         if(readStatusSelect.value === 'Unread'){
             ratingLabel.style.display = 'none';
             rating.style.display = 'none';
@@ -282,10 +291,6 @@ function loadBookPage(title, authors, description, language, categories, image, 
             ratingLabel.style.display = 'block';
             noRating = false;
         }
-
-        console.log(noRating);
-        console.log(rating.style.display);
-        console.log(rating.value);
     })
 
     const numberOfCopies = createInput('number', 1);
@@ -296,19 +301,23 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     const closeAddBookDialogBtn = createButton('X', 'close-add-book-dialog-btn');
 
-    addBookDialog.appendChild(titleLabel);
-    addBookDialog.appendChild(dialogTitle);
-    addBookDialog.appendChild(dialogImage);
-    addBookDialog.appendChild(linkLabel);
-    addBookDialog.appendChild(imageLink);
-    addBookDialog.appendChild(ratingLabel);
-    addBookDialog.appendChild(rating);
-    addBookDialog.appendChild(locationsLabel);
-    addBookDialog.appendChild(locationsHolder);
-    addBookDialog.appendChild(readLabel);
-    addBookDialog.appendChild(readStatusSelect);
-    addBookDialog.appendChild(saveBookBtn);
-    addBookDialog.appendChild(closeAddBookDialogBtn);
+    const children = [
+        titleLabel,
+        dialogTitle,
+        dialogImage,
+        linkLabel,
+        imageLink,
+        ratingLabel,
+        rating,
+        locationsLabel,
+        locationsHolder,
+        readLabel,
+        readStatusSelect,
+        saveBookBtn,
+        closeAddBookDialogBtn
+    ]
+    
+    appendChildren(children, addBookDialog);
 
     saveBookBtn.addEventListener('click', () => {
         const ratingValue = noRating ? null : rating.value;
@@ -382,7 +391,7 @@ function manuallyAddBook(){
     const manualAddBookPage = document.createElement('div');
 
     const title = createLabel('Title:', 'h3');
-    const titleInput = createLabel('input', '');
+    const titleInput = createInput('text', '');
 
     const authorTitle = createLabel('Author:', 'h3');
     const authorInput = createInput('text', '');
@@ -443,26 +452,30 @@ function manuallyAddBook(){
 
     const saveBookBtn = createButton('save');
 
-    manualAddBookPage.appendChild(title);
-    manualAddBookPage.appendChild(titleInput);
-    manualAddBookPage.appendChild(authorTitle);
-    manualAddBookPage.appendChild(authorInput);
-    manualAddBookPage.appendChild(coverDisplay);
-    manualAddBookPage.appendChild(imageLinkTitle);
-    manualAddBookPage.appendChild(imageLinkInput);
-    manualAddBookPage.appendChild(genreTitle);
-    manualAddBookPage.appendChild(genreHolder);
-    manualAddBookPage.appendChild(descriptionTitle);
-    manualAddBookPage.appendChild(description);
-    manualAddBookPage.appendChild(readStatusTitle);
-    manualAddBookPage.appendChild(readStatus);
-    manualAddBookPage.appendChild(ratingTitle);
-    manualAddBookPage.appendChild(rating);
-    manualAddBookPage.appendChild(locationTitle);
-    manualAddBookPage.appendChild(locationsSelect);
-    manualAddBookPage.appendChild(langInputTitle);
-    manualAddBookPage.appendChild(languageInput);
-    manualAddBookPage.appendChild(saveBookBtn);
+    const children = [
+        title,
+        titleInput,
+        authorTitle,
+        authorInput,
+        coverDisplay,
+        imageLinkTitle,
+        imageLinkInput,
+        genreTitle,
+        genreHolder,
+        descriptionTitle,
+        description,
+        readStatusTitle,
+        readStatus,
+        ratingTitle,
+        rating,
+        locationTitle,
+        locationsSelect,
+        langInputTitle,
+        languageInput,
+        saveBookBtn
+    ]
+
+    appendChildren(children, manualAddBookPage);
 
     pageHolder.appendChild(manualAddBookPage);
 
@@ -737,9 +750,8 @@ function generateWishListPage(){
 
     const closeWishListBtn = createButton('X', 'close-wishlist-btn');
 
-    wishListPage.appendChild(title);
-    wishListPage.appendChild(bookHolder);
-    wishListPage.appendChild(closeWishListBtn);
+    const children = [title, bookHolder, closeWishListBtn];
+    appendChildren(children, wishListPage);
 
     pageHolder.appendChild(wishListPage);
 
@@ -776,8 +788,6 @@ function generateWishListPage(){
     addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
 
     wishListPage.appendChild(addNewBookBtn);
-
-    console.log(user.wishlist);
 }
 
 function createBook(b){
@@ -806,9 +816,8 @@ function loadSearchPage(){
 
     const addManuallyBtn = createButton('+');
 
-    searchPage.appendChild(searchBar);
-    searchPage.appendChild(searchButton);
-    searchPage.appendChild(addManuallyBtn);
+    const children = [searchBar, searchButton, addManuallyBtn]
+    appendChildren(children, searchPage)
 
     pageHolder.appendChild(searchPage);
 
@@ -817,7 +826,6 @@ function loadSearchPage(){
     })
 
     searchBar.addEventListener('keydown', (event) => {
-        console.log(event.key)
         if(event.key === 'Enter'){
             searchBook(searchBar);
         }
@@ -841,49 +849,39 @@ function deleteBook(bookID){
     sortBooks(sortSelect.value);
 }
 
-//Book order sorting
-function oldToNewDateAddedSort(){
-    user.books = [...user.books].sort((a, b) => new Date(a.dateAdded).getTime() - new Date(b.dateAdded).getTime());
+function sortBy(field, ascending = true) {
+    user.books = [...user.books].sort((a, b) => {
+        let aVal = a[field];
+        let bVal = b[field];
+        
+        if (field === 'dateAdded' || field === 'publishedDate') {
+            aVal = new Date(aVal).getTime();
+            bVal = new Date(bVal).getTime();
+        }
+        
+        if (field === 'title') {
+            return ascending 
+                ? aVal.localeCompare(bVal, undefined, {sensitivity: 'base'})
+                : bVal.localeCompare(aVal, undefined, {sensitivity: 'base'});
+        }
+        
+        return ascending ? aVal - bVal : bVal - aVal;
+    });
 }
 
-function newToOldDateAddedSort(){
-    user.books = [...user.books].sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
-}
-
-function aToZSort(){
-    user.books = [...user.books].sort((a, b) => a.title.localeCompare(b.title, undefined, {sensitivity: 'base'}));
-}
-
-function zToASort(){
-    user.books = [...user.books].sort((a, b) => b.title.localeCompare(a.title, undefined, {sensitivity: 'base'}));
-}
-
-function newToOldPubDateSort(){
-    user.books = [...user.books].sort((a, b) => new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime());
-}
-
-function oldToNewPubDateSort(){
-    user.books = [...user.books].sort((a, b) => new Date(a.publishedDate).getTime() - new Date(b.publishedDate).getTime());
-}
-
-function ratingSortHighToLow(){
-    user.books = [...user.books].sort((a, b) => b.rating - a.rating);
-}
-
-function ratingSortLowToHigh(){
-    user.books = [...user.books].sort((a, b) => a.rating - b.rating);
-}
-
-function sortBooks(select){
-    if(select === 'A-Z') aToZSort();
-    else if(select === 'Z-A') zToASort();
-    else if(select === 'Publish Date (old - new)') oldToNewPubDateSort();
-    else if(select === 'Publish Date (new - old)') newToOldPubDateSort();
-    else if(select === 'Date Added (old - new)') oldToNewDateAddedSort();
-    else if(select === 'Date Added (new - old)') newToOldDateAddedSort();
-    else if(select === 'Rating (High - Low)') ratingSortHighToLow();
-    else if(select === 'Rating (Low - High)') ratingSortLowToHigh();
-
+function sortBooks(select) {
+    const sortMap = {
+        'A-Z': () => sortBy('title', true),
+        'Z-A': () => sortBy('title', false),
+        'Publish Date (old - new)': () => sortBy('publishedDate', true),
+        'Publish Date (new - old)': () => sortBy('publishedDate', false),
+        'Date Added (old - new)': () => sortBy('dateAdded', true),
+        'Date Added (new - old)': () => sortBy('dateAdded', false),
+        'Rating (High - Low)': () => sortBy('rating', false),
+        'Rating (Low - High)': () => sortBy('rating', true)
+    };
+    
+    sortMap[select]?.();
     filterBooks();
 }
 
@@ -938,17 +936,8 @@ function openEditDialog(book, container){
 
     const saveBtn = createButton('save');
 
-    dialogDiv.appendChild(title);
-    dialogDiv.appendChild(editBookTitle);
-    dialogDiv.appendChild(editBookPhoto);
-    dialogDiv.appendChild(link);
-    dialogDiv.appendChild(editBookLink);
-    dialogDiv.appendChild(locationsDiv);
-    dialogDiv.appendChild(readingStatusTitle);
-    dialogDiv.appendChild(undreadOrReadSelect);
-    dialogDiv.appendChild(bookRatingTitle);
-    dialogDiv.appendChild(editBookRating);
-    dialogDiv.appendChild(saveBtn);
+    const dialogDivChildren = [title, editBookTitle, editBookPhoto, link, editBookLink, locationsDiv, readingStatusTitle, undreadOrReadSelect, bookRatingTitle, editBookRating, saveBtn]
+    appendChildren(dialogDivChildren, dialogDiv)
     
     let noRating = true;
 
@@ -1014,7 +1003,7 @@ function displayGridView(){
         const title = createLabel(b.title, 'h3')
         title.classList.add('grid-view-title');
         
-        const authorsHolder = createInput('', 'h4');
+        const authorsHolder = createLabel('', 'h3');
         if(b.authors && b.authors.length > 0){
             b.authors.forEach(author => {
             authorsHolder.innerText += `${author} `;
@@ -1050,12 +1039,8 @@ function displayGridView(){
             deleteBook(b.id);
         });
 
-        book.appendChild(cover);
-        book.appendChild(title);
-        book.appendChild(authorsHolder);
-        book.appendChild(readStatus);
-        book.appendChild(removeBookBtn);
-        book.appendChild(editBookBtn);
+        const bookChildren = [cover, title, authorsHolder, readStatus, removeBookBtn, editBookBtn]
+        appendChildren(bookChildren, book);
 
         gridViewContainer.appendChild(book);
     });
@@ -1100,10 +1085,8 @@ function displayListView(){
             deleteBook(b.id);
         });
 
-        book.appendChild(cover);
-        book.appendChild(title);
-        book.appendChild(readStatus);
-        book.appendChild(removeBookBtn);
+        const bookChildren = [cover, title, readStatus, removeBookBtn]
+        appendChildren(bookChildren, book)
 
         listViewContainer.appendChild(book);
     });
