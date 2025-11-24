@@ -11,7 +11,7 @@ let booksHolder;
 let searchResultsContainer;
 let locationSelect;
 let readSelect;
-let genres = ['Philosophy', 'Fiction'];
+let genres = ['Philosophy', 'Fiction', 'History', 'Geography', 'Horror', 'Novel', 'Non-fiction', 'Classic'];
 
 const readingSatuses = ['Read', 'Reading', 'Unread'];
 
@@ -69,6 +69,43 @@ function createSelect(options = [], className = '') {
     return select;
 }
 
+function createLocationSelect(){
+    const locationsHolder = document.createElement('div');
+
+    user.locations.forEach(l => {
+        const locationDiv = createDiv(l, 'location-div');
+        locationDiv.value = l;
+        locationsHolder.appendChild(locationDiv);
+
+        locationDiv.addEventListener('click', () => {
+            document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
+            locationDiv.classList.add('selected-location');
+            if(genreSelect && readSelect) {
+                filterBooks();
+            }
+        })
+    })
+
+    return locationsHolder;
+}
+
+function createBook(b){
+    const book = createDiv('', 'book');
+    
+    const title = createLabel(b.title, 'h3');
+    title.classList.add('book-title');
+    
+    const img = document.createElement('img');
+    img.src = b.cover;
+    img.alt = b.title;
+    
+    book.appendChild(title);
+    book.appendChild(img);
+    
+    return book;
+}
+
+///////////// Searching and displaying books /////////////////////
 async function searchBook(searchBar){
     try {
         const bookTitle = searchBar.value;
@@ -266,10 +303,8 @@ function loadBookPage(title, authors, description, language, categories, image, 
     dialogImage.style.backgroundImage = `url(${imageLink.value})`;
 
     const ratingLabel = createLabel('BookRating', 'h3');
-    const rating = document.createElement('input');
-    rating.classList.add('rating')
-    rating.type = 'number';
-    rating.classList.add('add-book-rating');
+    const rating = createInput('number', '');
+    rating.classList.add('add-book-rating', 'rating');
     rating.min = 0;
     rating.max = 10;
     rating.style.display = 'inline';
@@ -365,7 +400,42 @@ function loadBookPage(title, authors, description, language, categories, image, 
     pageHolder.appendChild(bookPageContainer);
 }
 
+function loadSearchPage(){
+    pageHolder.innerHTML = '';
+    const searchPage = createDiv();
+
+    const searchBar = createInput('text');
+    
+    const searchButton = createButton('search');
+
+    const addManuallyBtn = createButton('+');
+
+    const children = [searchBar, searchButton, addManuallyBtn]
+    appendChildren(children, searchPage)
+
+    pageHolder.appendChild(searchPage);
+
+    searchButton.addEventListener('click', () => {
+        searchBook(searchBar);
+    })
+
+    searchBar.addEventListener('keydown', (event) => {
+        if(event.key === 'Enter'){
+            searchBook(searchBar);
+        }
+    })
+
+    addManuallyBtn.addEventListener('click', () => {
+        manuallyAddBook()
+    })
+}
+
+//////////////////// Adding books ////////////////////////
 function addBook(bookObj){
+    if(!bookObj.title || !bookObj.title.trim()) {
+        alert('Book must have a title');
+        return;
+    }
     if(user.books.findIndex(book => book.id === bookObj.id) !== -1){
         alert('Book already in library!');
     } else {
@@ -508,26 +578,7 @@ function generateBookId(){
     return id;
 }
 
-function createLocationSelect(){
-    const locationsHolder = document.createElement('div');
-
-    user.locations.forEach(l => {
-        const locationDiv = createDiv(l, 'location-div');
-        locationDiv.value = l;
-        locationsHolder.appendChild(locationDiv);
-
-        locationDiv.addEventListener('click', () => {
-            document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
-            locationDiv.classList.add('selected-location');
-            if(genreSelect && readSelect) {
-                filterBooks();
-            }
-        })
-    })
-
-    return locationsHolder;
-}
-
+////////////////// Create Home Page /////////////////////////////////
 function generateLibraryPage(){
     pageHolder.innerHTML = '';
     
@@ -602,8 +653,6 @@ function generateLibraryPage(){
     removeLocationBtn.addEventListener('click', () => {
         openDialog(removeLocationDialog)
     })
-
-    
     
     booksHolder = createDiv('', 'books-holder');
     libraryPage.appendChild(booksHolder);
@@ -635,7 +684,7 @@ function generateLibraryPage(){
     const locationInput = createInput('text', '');
     newLocationDialog.appendChild(locationInput);
 
-    const closeDialogBtn = createButton('X', 'close-gialog-btn');
+    const closeDialogBtn = createButton('X', 'close-dialog-btn');
     newLocationDialog.appendChild(closeDialogBtn);
     closeDialogBtn.addEventListener('click', () => {
         closeDialog(newLocationDialog);
@@ -706,6 +755,7 @@ function generateRemoveLocations(removeLocationDialog){
     removeLocationDialog.appendChild(closeBtn);
 }
 
+/////////////////// Wishlist functionality ////////////////////////////////
 function addToWishlist(book){
     if(user.books.findIndex(e => e.id === book.id) !== -1){
         alert('You already own this book!');
@@ -768,52 +818,6 @@ function generateWishListPage(){
     addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
 
     wishListPage.appendChild(addNewBookBtn);
-}
-
-function createBook(b){
-    const book = createDiv('', 'book');
-    
-    const title = createLabel(b.title, 'h3');
-    title.classList.add('book-title');
-    
-    const img = document.createElement('img');
-    img.src = b.cover;
-    img.alt = b.title;
-    
-    book.appendChild(title);
-    book.appendChild(img);
-    
-    return book;
-}
-
-function loadSearchPage(){
-    pageHolder.innerHTML = '';
-    const searchPage = createDiv();
-
-    const searchBar = createInput('text');
-    
-    const searchButton = createButton('search');
-
-    const addManuallyBtn = createButton('+');
-
-    const children = [searchBar, searchButton, addManuallyBtn]
-    appendChildren(children, searchPage)
-
-    pageHolder.appendChild(searchPage);
-
-    searchButton.addEventListener('click', () => {
-        searchBook(searchBar);
-    })
-
-    searchBar.addEventListener('keydown', (event) => {
-        if(event.key === 'Enter'){
-            searchBook(searchBar);
-        }
-    })
-
-    addManuallyBtn.addEventListener('click', () => {
-        manuallyAddBook()
-    })
 }
 
 function displayMyBooks(){
@@ -890,7 +894,6 @@ function openEditDialog(book, container){
 
     const link = createLabel('Book URL:', 'h3');
     const editBookLink = createInput('text', book.cover);
-    editBookLink.value = book.cover;
 
     const locationsDiv = createDiv();
     createSelectableLocations(locationsDiv, book);
@@ -990,11 +993,8 @@ function createBookCard(book, viewType) {
     
     const readStatus = createDiv(book.readStatus || 'Unread');
     
-    bookCard.appendChild(cover);
-    bookCard.appendChild(title);
-    bookCard.appendChild(readStatus);
-    bookCard.appendChild(removeBtn);
-    
+    const bookCardChildren = [cover,title,readStatus,removeBtn]
+    appendChildren(bookCardChildren, bookCard)
 
     if(viewType === 'grid-view' && book.authors && book.authors.length > 0) {
         const authorsHolder = document.createElement('h4');
