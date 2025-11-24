@@ -18,7 +18,7 @@ const readingSatuses = ['Read', 'Reading', 'Unread'];
 const user = JSON.parse(localStorage.getItem('user')) || {books: [], genres: [], locations: ['Bookshelf', 'Kindle'], wishlist: []} 
 
 let filteredBooks = [...user.books];
-
+/////////////// Element Creation Functions: ////////////////////
 function createLabel(text, tag = 'h3'){
     const label = document.createElement(tag);
     label.innerText = text;
@@ -41,6 +41,14 @@ function createButton(text, className){
     return btn;
 }
 
+function createDiv(text, className){
+    const div = document.createElement('div');
+    if(text) div.innerText = text;
+    if(className) div.classList.add(className);
+
+    return div;
+}
+
 async function searchBook(searchBar){
     const bookTitle = searchBar.value;
     const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
@@ -53,8 +61,7 @@ async function searchBook(searchBar){
 function displaySearchResults(data){
     pageHolder.innerHTML = '';
     if (!searchResultsContainer) {
-        searchResultsContainer = document.createElement('div');
-        searchResultsContainer.classList.add('search-results-container');
+        searchResultsContainer = createDiv('', 'search-results-container');
         pageHolder.innerHTML = '';
         pageHolder.appendChild(searchResultsContainer);
     }
@@ -74,25 +81,20 @@ function displaySearchResults(data){
         const id = book.id;
         const publishedDate = book.volumeInfo.publishedDate;
 
-        const result = document.createElement('div');
-        result.classList.add('search-result');
+        const result = createDiv('', 'search-result');
 
         result.addEventListener('click', function(){
             loadBookPage(bookTitle, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate)
         })
 
-        const resultImage = document.createElement('div');
+        const resultImage = createDiv('', 'search-result-img');
         resultImage.style.backgroundImage = `url(${image})`;
-        resultImage.classList.add('search-result-img');
         
-        const title = document.createElement('h2');
-        title.innerText = bookTitle;
+        const title = createLabel(bookTitle, 'h2');
 
-        const authorsHolder = document.createElement('div');
+        const authorsHolder = createDiv();
         authors.forEach(person => {
-           const contributer = document.createElement('div');
-           contributer.classList.add('search-result-author');
-           contributer.innerText = person;
+           const contributer = createDiv(person, 'search-result-author');
 
            authorsHolder.appendChild(contributer);
         })
@@ -100,30 +102,23 @@ function displaySearchResults(data){
         const descriptionHolder = document.createElement('p');
         descriptionHolder.innerText = description;
 
-        const languageHolder = document.createElement('div');
-        languageHolder.classList.add('search-result-language-holder');
-        languageHolder.innerText = language;
+        const languageHolder = createDiv(language, 'search-result-language-holder');
 
-        const categoriesHolder = document.createElement('div');
-        categoriesHolder.classList.add('categories-holder');
+        const categoriesHolder = createDiv('', 'categories-holder');
 
-        categories.forEach(catergory => {
-            const c = document.createElement('div');
-            c.classList.add('catergory');
-            c.innerText = catergory;
+        categories.forEach(category => {
+            const c = createDiv(category, 'category');
             categoriesHolder.appendChild(c);
         })
 
-        const identifiersHolder = document.createElement('div');
+        const identifiersHolder = createDiv();
 
         identifiers.forEach(i => {
-            const type = document.createElement('div');
-            type.innerText = i.type;
+            const type = createDiv(i.type);
 
-            const id = document.createElement('div');
-            id.innerText = i.identifier;
+            const id = createDiv(i.identifier);
 
-            const div = document.createElement('div');
+            const div = createDiv();
             div.appendChild(type);
             div.appendChild(id);
 
@@ -145,44 +140,34 @@ function displaySearchResults(data){
 function loadBookPage(title, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate){
     pageHolder.innerHTML = '';
     
-    const bookPageContainer = document.createElement('div');
-    bookPageContainer.classList.add('book-page-container');
+    const bookPageContainer = createDiv('', 'book-page-container');
     
     const authorsArray = authors;
     const bookCoverURL = image;
 
-    const leftSideHolder = document.createElement('div');
-    leftSideHolder.classList.add('book-page-left');
+    const leftSideHolder = createDiv('', 'book-page-left');
 
-    const bookCover = document.createElement('div');
-    bookCover.classList.add('book-page-cover');
+    const bookCover = createDiv('', 'book-page-cover');
     bookCover.style.backgroundImage = `url(${bookCoverURL})`;
 
     leftSideHolder.appendChild(bookCover);
 
-    const rightSideHolder = document.createElement('div');
-    rightSideHolder.classList.add('book-page-right');
+    const rightSideHolder = createDiv('', 'book-page-right');
 
-    const bookTitle = document.createElement('div');
-    bookTitle.classList.add('book-page-title');
-    bookTitle.innerText = title;
+    const bookTitle = createDiv(title, 'book-page-title');
     rightSideHolder.appendChild(bookTitle);
 
-    const authorsHolder = document.createElement('div');
+    const authorsHolder = createDiv();
     rightSideHolder.appendChild(authorsHolder);
     authorsArray.forEach(author => {
-        const authorCard = document.createElement('div');
-        authorCard.classList.add('author-card');
-        authorCard.innerText = author;
+        const authorCard = createDiv(author, 'author-card');
         authorsHolder.appendChild(authorCard);
     });
 
-    const categoriesHolder = document.createElement('div');
+    const categoriesHolder = createDiv();
     rightSideHolder.appendChild(categoriesHolder);
     categories.forEach(category => {
-        const genreCard = document.createElement('div');
-        genreCard.classList.add('book-page-category');
-        genreCard.innerText = category;
+        const genreCard = createDiv(category, 'book-page-category');
         categoriesHolder.appendChild(genreCard);
     })
 
@@ -191,31 +176,25 @@ function loadBookPage(title, authors, description, language, categories, image, 
     bookDescription.classList.add('book-page-description');
     rightSideHolder.appendChild(bookDescription);
 
-    const languageHolder = document.createElement('div');
-    languageHolder.classList.add('book-page-language-holder');
+    const languageHolder = createDiv('', 'book-page-language-holder');
     rightSideHolder.appendChild(languageHolder);
 
-    const langTitle = document.createElement('div');
-    langTitle.innerText = 'Lang:';
-    langTitle.classList.add('book-page-lang-title');
+    const langTitle = createDiv('Lang:', 'book-page-lang-title');
     languageHolder.appendChild(langTitle);
 
-    const bookLanguage = document.createElement('div');
-    bookLanguage.innerText = language;
+    const bookLanguage = createDiv(language);
     languageHolder.appendChild(bookLanguage);
 
     const identifiersArray = identifiers;
-    const identifiersHolder = document.createElement('div');
+    const identifiersHolder = createDiv();
     rightSideHolder.appendChild(identifiersHolder);
 
     identifiersArray.forEach(i => {
-        const type = document.createElement('div');
-        type.innerText = i.type;
+        const type = createDiv(i.type);
 
-        const id = document.createElement('div');
-        id.innerText = i.identifier;
+        const id = createDiv(i.identifier);
 
-        const div = document.createElement('div');
+        const div = createDiv();
         div.appendChild(type);
         div.appendChild(id);
 
@@ -250,8 +229,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
     const titleLabel = createLabel('Title:', 'h3');
     const dialogTitle = createInput('text', title);
 
-    const dialogImage = document.createElement('div');
-    dialogImage.classList.add('add-book-dialog-image');
+    const dialogImage = createDiv('', 'add-book-dialog-image');
 
     const linkLabel = createLabel('Photo URL:', 'h3');
     const imageLink = createInput('text', image); 
@@ -416,7 +394,7 @@ function manuallyAddBook(){
 
     const genreTitle = createLabel('Categories', 'h3');
 
-    const genreHolder = document.createElement('div');
+    const genreHolder = createDiv();
     
     genres.forEach(genre => {
         const genreCard = createGenreCard(genre)
@@ -525,9 +503,7 @@ function createLocationSelect(){
     const locationsHolder = document.createElement('div');
 
     user.locations.forEach(l => {
-        const locationDiv = document.createElement('div');
-        locationDiv.classList.add('location-div');
-        locationDiv.innerText = l;
+        const locationDiv = createDiv(l, 'location-div');
         locationDiv.value = l;
         locationsHolder.appendChild(locationDiv);
 
@@ -546,20 +522,15 @@ function createLocationSelect(){
 function generateLibraryPage(){
     pageHolder.innerHTML = '';
     
-    const libraryPage = document.createElement('div');
-    libraryPage.classList.add('library-page');
+    const libraryPage = createDiv('', 'library-page');
 
-    const titleSection = document.createElement('div');
-    titleSection.innerText = 'My Books';
-    titleSection.classList.add('title-section');
+    const titleSection = createDiv('My Books', 'title-section');
     libraryPage.appendChild(titleSection);
 
-    const filterBar = document.createElement('div');
-    filterBar.classList.add('filter-bar');
+    const filterBar = createDiv('', 'filter-bar');
     libraryPage.appendChild(filterBar);
 
-    const sortContainer = document.createElement('div');
-    sortContainer.classList.add('sort-container');
+    const sortContainer = createDiv('', 'sort-container');
     filterBar.appendChild(sortContainer);
 
     sortSelect = document.createElement('select');
@@ -576,8 +547,7 @@ function generateLibraryPage(){
     `;
     sortContainer.appendChild(sortSelect);
 
-    const viewContainer = document.createElement('div');
-    viewContainer.classList.add('view-container');
+    const viewContainer = createDiv('', 'view-container');
     filterBar.appendChild(viewContainer);
 
     viewSelect = document.createElement('select');
@@ -588,8 +558,7 @@ function generateLibraryPage(){
     `;
     viewContainer.appendChild(viewSelect);
 
-    const genreContainer = document.createElement('div');
-    genreContainer.classList.add('genre-container');
+    const genreContainer = createDiv('', 'genre-container');
     filterBar.appendChild(genreContainer);
 
     genreSelect = document.createElement('select');
@@ -616,18 +585,15 @@ function generateLibraryPage(){
 
     libraryPage.appendChild(removeLocationDialog);
 
-    const locationContainer = document.createElement('div');
-    locationContainer.classList.add('location-container');
-    filterBar.appendChild(locationContainer);
+    const locationContainer = createDiv('', 'location-container');
     locationSelect = createLocationSelect()
     locationSelect.classList.add('location-select');
     locationContainer.appendChild(locationSelect)
+    filterBar.appendChild(locationContainer);
 
-    const defaultLocation = document.createElement('div');
-    defaultLocation.classList.add('location-div');
+    const defaultLocation = createDiv('All Locations', 'location-div');
     defaultLocation.classList.add('selected-location');
     defaultLocation.value = 'All Locations';
-    defaultLocation.innerText = 'All Locations';
     locationSelect.appendChild(defaultLocation);
     defaultLocation.addEventListener('click', () => {
             document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
@@ -646,8 +612,7 @@ function generateLibraryPage(){
 
     
     
-    booksHolder = document.createElement('div');
-    booksHolder.classList.add('books-holder');
+    booksHolder = createDiv('', 'books-holder');
     libraryPage.appendChild(booksHolder);
 
     pageHolder.appendChild(libraryPage);
@@ -697,8 +662,7 @@ function generateLibraryPage(){
 
     libraryPage.appendChild(addNewBookBtn);
 
-    const openWishlistBtn = document.createElement('div');
-    openWishlistBtn.classList.add('open-wish-list-button');
+    const openWishlistBtn = createDiv('', 'open-wish-list-button');
 
     const heartImage = document.createElement('div');
     heartImage.classList.add('heart-img');
@@ -722,10 +686,9 @@ function generateRemoveLocations(removeLocationDialog){
     removeLocationDialog.appendChild(removeTitle);
 
     user.locations.forEach(l => {
-        const removeLocationCard = document.createElement('div');
+        const removeLocationCard = createDiv();
         
         const locationTitle = createLabel(l, 'h3');
-        locationTitle.innerText = l;
 
         const removeBtn = createButton('X');
 
@@ -766,14 +729,11 @@ function addToWishlist(book){
 function generateWishListPage(){
     pageHolder.innerHTML = '';
 
-    const wishListPage = document.createElement('div');
-    wishListPage.id = 'wish-list-page';
+    const wishListPage = createDiv('', 'wish-list-page');
 
     const title = createLabel('Wishlist', 'h1');
 
-
-    const bookHolder = document.createElement('div');
-    bookHolder.classList.add('wish-list-book-holder');
+    const bookHolder = createDiv('', 'wish-list-book-holder');
 
     const closeWishListBtn = createButton('X', 'close-wishlist-btn');
 
@@ -821,12 +781,10 @@ function generateWishListPage(){
 }
 
 function createBook(b){
-    const book = document.createElement('div');
-    book.classList.add('book');
+    const book = createDiv('', 'book');
     
     const title = createLabel(b.title, 'h3');
     title.classList.add('book-title');
-    title.innerText = b.title;
     
     const img = document.createElement('img');
     img.src = b.cover;
@@ -840,7 +798,7 @@ function createBook(b){
 
 function loadSearchPage(){
     pageHolder.innerHTML = '';
-    const searchPage = document.createElement('div');
+    const searchPage = createDiv();
 
     const searchBar = createInput('text');
     
@@ -944,23 +902,19 @@ function getRatingColour(rating){
 function openEditDialog(book, container){
     const editBookDialog = document.createElement('dialog');
 
-    const dialogDiv = document.createElement('div');
-    dialogDiv.classList.add('dialog-div');
+    const dialogDiv = createDiv('', 'dialog-div');
     editBookDialog.appendChild(dialogDiv);
 
     const title = createLabel('Title:', 'h3');
-
     const editBookTitle = createInput('text', book.title)
-
     const editBookPhoto = document.createElement('div');
     editBookPhoto.style.backgroundImage = `url(${book.cover})`;
 
     const link = createLabel('Book URL:', 'h3');
-
     const editBookLink = createInput('text', book.cover);
     editBookLink.value = book.cover;
 
-    const locationsDiv = document.createElement('div');
+    const locationsDiv = createDiv();
     createSelectableLocations(locationsDiv, book);
 
     const readingStatusTitle = createLabel('Read Status:', 'h3');
@@ -990,6 +944,7 @@ function openEditDialog(book, container){
     dialogDiv.appendChild(link);
     dialogDiv.appendChild(editBookLink);
     dialogDiv.appendChild(locationsDiv);
+    dialogDiv.appendChild(readingStatusTitle);
     dialogDiv.appendChild(undreadOrReadSelect);
     dialogDiv.appendChild(bookRatingTitle);
     dialogDiv.appendChild(editBookRating);
@@ -1048,16 +1003,13 @@ function openEditDialog(book, container){
 function displayGridView(){
     booksHolder.innerHTML = '';
 
-    const gridViewContainer = document.createElement('div');
-    gridViewContainer.classList.add('grid-view-container');
+    const gridViewContainer = createDiv('', 'grid-view-container');
 
     filteredBooks.forEach(b => {
-        const book = document.createElement('div');
-        book.classList.add('grid-view-book');
+        const book = createDiv('', 'grid-view-book');
 
-        const cover = document.createElement('div');
+        const cover = createDiv('', 'grid-view-cover');
         cover.style.backgroundImage = `url(${b.cover})`;
-        cover.classList.add('grid-view-cover');
         
         const title = createLabel(b.title, 'h3')
         title.classList.add('grid-view-title');
@@ -1077,7 +1029,7 @@ function displayGridView(){
         const removeBookBtn = createButton('X', 'grid-view-remove-btn');
        
         if(b.rating){
-            const ratingDiv = document.createElement('div');
+            const ratingDiv = createDiv('', 'book-rationg');
             ratingDiv.classList.add('book-rating');
             ratingDiv.innerText = b.rating;
             book.appendChild(ratingDiv);
@@ -1088,7 +1040,7 @@ function displayGridView(){
             ratingDiv.style.color = ratingColors[1];
         }
         
-        const readStatus = document.createElement('div');
+        const readStatus = createDiv();
         if(!b.readStatus){
             b.readStatus = 'Unread'
         }
@@ -1114,25 +1066,20 @@ function displayGridView(){
 function displayListView(){
     booksHolder.innerHTML = '';
 
-    const listViewContainer = document.createElement('div');
-    listViewContainer.classList.add('list-view-container');
+    const listViewContainer = createDiv('', 'list-view-container');
 
     filteredBooks.forEach(b => {
-        const book = document.createElement('div');
-        book.classList.add('list-view-book');
+        const book = createDiv('', 'list-view-book');
 
-        const cover = document.createElement('div');
+        const cover = createDiv('', 'list-view-cover');
         cover.style.backgroundImage = `url(${b.cover})`;
-        cover.classList.add('list-view-cover');
         
         const title = createLabel(b.title, 'h3');
 
         const removeBookBtn = createButton('X');
 
         if(b.rating){
-            const ratingDiv = document.createElement('div');
-            ratingDiv.classList.add('list-book-rating');
-            ratingDiv.innerText = b.rating;
+            const ratingDiv = createDiv(b.rating, 'list-book-rating');
 
             const ratingColors = getRatingColour(b.rating);
 
@@ -1143,7 +1090,7 @@ function displayListView(){
         }
         
 
-        const readStatus = document.createElement('div');
+        const readStatus = createDiv();
         if(!b.readStatus){
             b.readStatus = 'Unread'
         }
