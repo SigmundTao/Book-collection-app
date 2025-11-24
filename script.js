@@ -445,7 +445,7 @@ function manuallyAddBook(){
     rating.value = null;
     rating.type = 'number';
     rating.min = 1;
-    rating.max = 0;
+    rating.max = 10;
 
     const readStatusTitle = document.createElement('h3');
     readStatusTitle.innerText = 'Read Status:';
@@ -485,10 +485,6 @@ function manuallyAddBook(){
 
     const saveBookBtn = document.createElement('button');
     saveBookBtn.innerText = 'Save';
-
-    manualAddBookPage.appendChild(titleInput);
-    manualAddBookPage.appendChild(coverDisplay);
-    manualAddBookPage.appendChild(imageLinkInput);
 
     manualAddBookPage.appendChild(title);
     manualAddBookPage.appendChild(titleInput);
@@ -559,7 +555,9 @@ function createLocationSelect(){
         locationDiv.addEventListener('click', () => {
             document.querySelectorAll('.location-div').forEach(e => e.classList.remove('selected-location'));
             locationDiv.classList.add('selected-location');
-            filterBooks();
+            if(genreSelect && readSelect) {
+                filterBooks();
+            }
         })
     })
 
@@ -700,7 +698,7 @@ function generateLibraryPage(){
     libraryPage.appendChild(newLocationDialog);
 
     const locationInput = document.createElement('input');
-    locationInput.type = Text;
+    locationInput.type = 'text';
     newLocationDialog.appendChild(locationInput);
 
     const closeDialogBtn = document.createElement('button');
@@ -789,6 +787,9 @@ function addToWishlist(book){
         alert('You already own this book!');
     }else if(user.wishlist.findIndex(e => e.id === book.id) === -1){
         user.wishlist.push(book)
+        alert('Book added to wishlist!');
+    } else {
+        alert('Book already in wishlist!');
     }
 
     updateUserData()
@@ -798,7 +799,7 @@ function generateWishListPage(){
     pageHolder.innerHTML = '';
 
     const wishListPage = document.createElement('div');
-    wishListPage.classList.id = 'wish-list-page';
+    wishListPage.id = 'wish-list-page';
 
     const title = document.createElement('h1');
     title.innerText = 'Wishlist';
@@ -831,8 +832,6 @@ function generateWishListPage(){
         addToLibraryBtn.addEventListener('click', () => {
             user.books.push(b);
             user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
-            console.log(user.wishList);
-            console.log(user.books);
             updateUserData()
             generateWishListPage()
         })
@@ -1003,7 +1002,7 @@ function openEditDialog(book, container){
     link.innerText = 'Photo URL:'
 
     const editBookLink = document.createElement('input');
-    editBookLink.type = Text;
+    editBookLink.type = 'text';
     editBookLink.value = book.cover;
 
     const locationsDiv = document.createElement('div');
@@ -1116,9 +1115,7 @@ function displayGridView(){
         title.classList.add('grid-view-title');
         
         const authorsHolder = document.createElement('h4');
-        if(b.authors.length <= 0){
-
-        } else {
+        if(b.authors && b.authors.length > 0){
             b.authors.forEach(author => {
             authorsHolder.innerText += `${author} `;
             })
@@ -1305,16 +1302,6 @@ function removeLocation(location, dialog){
     closeDialog(dialog)
     generateLibraryPage()
 }
-
-//Make all dialogs closable with Esc
-const dialogs = document.querySelectorAll('dialog')
-dialogs.forEach(d => {
-    d.addEventListener('keydown', (event) => {
-        if(event.key === 'Escape'){
-            closeDialog(d);
-        }
-    });
-})
 
 function createSelectableLocations(locationsDiv, book){
     const bookIndex = user.books.findIndex(b => b.id === book.id);
