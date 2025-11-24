@@ -33,6 +33,14 @@ function createInput(type = 'text', value = ''){
     return input;
 }
 
+function createButton(text, className){
+    const btn = document.createElement('button');
+    btn.innerText = text;
+    btn.classList.add(className);
+
+    return btn;
+}
+
 async function searchBook(searchBar){
     const bookTitle = searchBar.value;
     const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
@@ -214,8 +222,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
         identifiersHolder.appendChild(div);
     })
 
-    const addToWishListBtn = document.createElement('button');
-    addToWishListBtn.innerText = 'W';
+    const addToWishListBtn = createButton('W');
     leftSideHolder.appendChild(addToWishListBtn);
 
     addToWishListBtn.addEventListener('click', () => {
@@ -232,9 +239,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
     })
     })
 
-    const addBookBtn = document.createElement('button');
-    addBookBtn.classList.add('add-book-btn');
-    addBookBtn.innerText = '+';
+    const addBookBtn = createButton('+', 'Add-book-btn');
     leftSideHolder.appendChild(addBookBtn);
 
     //add book dialog
@@ -243,20 +248,17 @@ function loadBookPage(title, authors, description, language, categories, image, 
     bookPageContainer.appendChild(addBookDialog);
 
     const titleLabel = createLabel('Title:', 'h3');
-
     const dialogTitle = createInput('text', title);
 
     const dialogImage = document.createElement('div');
     dialogImage.classList.add('add-book-dialog-image');
 
     const linkLabel = createLabel('Photo URL:', 'h3');
-
     const imageLink = createInput('text', image); 
 
     dialogImage.style.backgroundImage = `url(${imageLink.value})`;
 
     const ratingLabel = createLabel('BookRating', 'h3');
-
     const rating = document.createElement('input');
     rating.classList.add('rating')
     rating.type = 'number';
@@ -308,18 +310,13 @@ function loadBookPage(title, authors, description, language, categories, image, 
         console.log(rating.value);
     })
 
-    const numberOfCopies = document.createElement('input');
-    numberOfCopies.type = 'number';
-    numberOfCopies.value = 1;
+    const numberOfCopies = createInput('number', 1);
     numberOfCopies.min = 1;
     numberOfCopies.max = 100;
 
-    const saveBookBtn = document.createElement('button');
-    saveBookBtn.innerText = 'Add Book';
+    const saveBookBtn = createButton('Add Book');
 
-    const closeAddBookDialogBtn = document.createElement('button');
-    closeAddBookDialogBtn.classList.add('close-add-book-dialog-btn');
-    closeAddBookDialogBtn.innerText = 'X';
+    const closeAddBookDialogBtn = createButton('X', 'close-add-book-dialog-btn');
 
     addBookDialog.appendChild(titleLabel);
     addBookDialog.appendChild(dialogTitle);
@@ -366,9 +363,7 @@ function loadBookPage(title, authors, description, language, categories, image, 
         openDialog(addBookDialog);
     });
 
-    const quitBtn = document.createElement('button');
-    quitBtn.innerText = 'X';
-    quitBtn.classList.add('book-page-quit-btn');
+    const quitBtn = createButton('X', 'book-page-quit-btn');
     leftSideHolder.appendChild(quitBtn);
 
     quitBtn.addEventListener('click', () => {
@@ -468,8 +463,7 @@ function manuallyAddBook(){
     const langInputTitle = createLabel('Language:', 'h3');
     const languageInput = createInput('text', '');
 
-    const saveBookBtn = document.createElement('button');
-    saveBookBtn.innerText = 'Save';
+    const saveBookBtn = createButton('save');
 
     manualAddBookPage.appendChild(title);
     manualAddBookPage.appendChild(titleInput);
@@ -641,12 +635,10 @@ function generateLibraryPage(){
             filterBooks();
     })
 
-    const addNewLocationBtn = document.createElement('button');
-    addNewLocationBtn.innerText = 'add new location'
+    const addNewLocationBtn = createButton('Add New Location');
     filterBar.appendChild(addNewLocationBtn);
 
-    const removeLocationBtn = document.createElement('button');
-    removeLocationBtn.innerText = 'remove location'
+    const removeLocationBtn = createButton('Remove Location');
     filterBar.appendChild(removeLocationBtn);
     removeLocationBtn.addEventListener('click', () => {
         openDialog(removeLocationDialog)
@@ -685,17 +677,14 @@ function generateLibraryPage(){
     const locationInput = createInput('text', '');
     newLocationDialog.appendChild(locationInput);
 
-    const closeDialogBtn = document.createElement('button');
-    closeDialogBtn.classList.add('close-dialog-btn');
-    closeDialogBtn.innerText = 'x';
+    const closeDialogBtn = createButton('X', 'close-gialog-btn');
     newLocationDialog.appendChild(closeDialogBtn);
     closeDialogBtn.addEventListener('click', () => {
         closeDialog(newLocationDialog);
     })
 
-    const saveNewLocationBtn = document.createElement('button');
+    const saveNewLocationBtn = createButton('Save');
     newLocationDialog.appendChild(saveNewLocationBtn);
-    saveNewLocationBtn.innerText = 'Save';
     saveNewLocationBtn.addEventListener('click', () => {
         saveNewLocation(locationInput.value);
         closeDialog(newLocationDialog);
@@ -703,9 +692,7 @@ function generateLibraryPage(){
 
     addNewLocationBtn.addEventListener('click', () => {openDialog(newLocationDialog)})
 
-    const addNewBookBtn = document.createElement('button');
-    addNewBookBtn.classList.add('add-new-book-btn');
-    addNewBookBtn.innerText = '+';
+    const addNewBookBtn = createButton('+', 'add-new-book-btn');
     addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
 
     libraryPage.appendChild(addNewBookBtn);
@@ -740,8 +727,7 @@ function generateRemoveLocations(removeLocationDialog){
         const locationTitle = createLabel(l, 'h3');
         locationTitle.innerText = l;
 
-        const removeBtn = document.createElement('button');
-        removeBtn.innerText = 'X';
+        const removeBtn = createButton('X');
 
         removeLocationCard.appendChild(locationTitle);
         removeLocationCard.appendChild(removeBtn);
@@ -755,8 +741,7 @@ function generateRemoveLocations(removeLocationDialog){
         })
     })
 
-    const closeBtn = document.createElement('button');
-    closeBtn.innerText = 'close dialog';
+    const closeBtn = createButton('Close Dialog')
     closeBtn.addEventListener('click', () => {
         closeDialog(removeLocationDialog);
         generateLibraryPage()
@@ -790,9 +775,7 @@ function generateWishListPage(){
     const bookHolder = document.createElement('div');
     bookHolder.classList.add('wish-list-book-holder');
 
-    const closeWishListBtn = document.createElement('button');
-    closeWishListBtn.classList.add('close-wishlist-btn');
-    closeWishListBtn.innerText = 'X';
+    const closeWishListBtn = createButton('X', 'close-wishlist-btn');
 
     wishListPage.appendChild(title);
     wishListPage.appendChild(bookHolder);
@@ -807,8 +790,7 @@ function generateWishListPage(){
         const book = createBook(b);
         bookHolder.appendChild(book);
 
-        const addToLibraryBtn = document.createElement('button');
-        addToLibraryBtn.innerText = '+';
+        const addToLibraryBtn = createButton('+')
 
         book.appendChild(addToLibraryBtn);
 
@@ -819,8 +801,7 @@ function generateWishListPage(){
             generateWishListPage()
         })
 
-        const removeBtn = document.createElement('button');
-        removeBtn.innerText = 'X';
+        const removeBtn = createButton('X');
 
         removeBtn.addEventListener('click', () => {
             user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
@@ -831,9 +812,7 @@ function generateWishListPage(){
         book.appendChild(removeBtn);
     })
 
-    const addNewBookBtn = document.createElement('button');
-    addNewBookBtn.classList.add('add-new-book-btn');
-    addNewBookBtn.innerText = '+';
+    const addNewBookBtn = createButton('+', 'add-new-book-btn');
     addNewBookBtn.addEventListener('click', () => {loadSearchPage()})
 
     wishListPage.appendChild(addNewBookBtn);
@@ -865,11 +844,9 @@ function loadSearchPage(){
 
     const searchBar = createInput('text');
     
-    const searchButton = document.createElement('button');
-    searchButton.innerText = 'Search';
+    const searchButton = createButton('search');
 
-    const addManuallyBtn = document.createElement('button');
-    addManuallyBtn.innerText = '+';
+    const addManuallyBtn = createButton('+');
 
     searchPage.appendChild(searchBar);
     searchPage.appendChild(searchButton);
@@ -1005,8 +982,7 @@ function openEditDialog(book, container){
     editBookRating.max = 10;
     editBookRating.min = 1;
 
-    const saveBtn = document.createElement('button');
-    saveBtn.innerText = 'save';
+    const saveBtn = createButton('save');
 
     dialogDiv.appendChild(title);
     dialogDiv.appendChild(editBookTitle);
@@ -1058,8 +1034,7 @@ function openEditDialog(book, container){
         displayMyBooks()
     })
 
-    const closeDialogBtn = document.createElement('button');
-    closeDialogBtn.innerText = 'X';
+    const closeDialogBtn = createButton('X');
     dialogDiv.appendChild(closeDialogBtn);
 
     closeDialogBtn.addEventListener('click', () => {
@@ -1087,7 +1062,7 @@ function displayGridView(){
         const title = createLabel(b.title, 'h3')
         title.classList.add('grid-view-title');
         
-        const authorsHolder = document.createElement('h4');
+        const authorsHolder = createInput('', 'h4');
         if(b.authors && b.authors.length > 0){
             b.authors.forEach(author => {
             authorsHolder.innerText += `${author} `;
@@ -1095,15 +1070,12 @@ function displayGridView(){
         }
         
 
-        const editBookBtn = document.createElement('button');
-        editBookBtn.innerText = 'edit';
+        const editBookBtn = createButton('Edit');
 
         editBookBtn.addEventListener('click', () => {openEditDialog(b, booksHolder)})
 
-        const removeBookBtn = document.createElement('button');
-        removeBookBtn.innerText = 'x';
-        removeBookBtn.classList.add('grid-view-remove-btn');
-
+        const removeBookBtn = createButton('X', 'grid-view-remove-btn');
+       
         if(b.rating){
             const ratingDiv = document.createElement('div');
             ratingDiv.classList.add('book-rating');
@@ -1155,8 +1127,7 @@ function displayListView(){
         
         const title = createLabel(b.title, 'h3');
 
-        const removeBookBtn = document.createElement('button');
-        removeBookBtn.innerText = 'x';
+        const removeBookBtn = createButton('X');
 
         if(b.rating){
             const ratingDiv = document.createElement('div');
