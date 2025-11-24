@@ -55,13 +55,32 @@ function appendChildren(childArray, parent){
     })
 }
 
-async function searchBook(searchBar){
-    const bookTitle = searchBar.value;
-    const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
+function createSelect(options = [], className = '') {
+    const select = document.createElement('select');
+    if(className) select.classList.add(className);
+    
+    options.forEach(opt => {
+        const option = document.createElement('option');
+        option.innerText = opt;
+        option.value = opt;
+        select.appendChild(option);
+    });
+    
+    return select;
+}
 
-    const response = await fetch(searchURL);
-    const data = await response.json();
-    displaySearchResults(data)
+async function searchBook(searchBar){
+    try {
+        const bookTitle = searchBar.value;
+        const searchURL = `https://www.googleapis.com/books/v1/volumes?q=${bookTitle}&key=${API_KEY}`
+
+        const response = await fetch(searchURL);
+        const data = await response.json();
+        displaySearchResults(data)
+    } catch (error){
+        console.error('Search error:', error);
+        alert('Failed to search books. Please try again.');
+    };
 }
 
 function displaySearchResults(data){
@@ -257,27 +276,11 @@ function loadBookPage(title, authors, description, language, categories, image, 
 
     const locationsLabel = createLabel('Location:');
 
-    const locationsHolder = document.createElement('select');
-    user.locations.forEach(l => {
-        const locationOption = document.createElement('option');
-        locationOption.innerText = l;
-        locationOption.value = l;
-
-        locationsHolder.appendChild(locationOption);
-    })
+    const locationsHolder = createSelect(user.locations);
 
     const readLabel = createLabel('Read Status', 'h3')
 
-    const readStatusSelect = document.createElement('select');
-    readStatusSelect.classList.add('read-status-select');
-
-    readingSatuses.forEach(opt => {
-        const optionDiv = document.createElement('option');
-        optionDiv.innerText = opt;
-        optionDiv.value = opt;
-
-        readStatusSelect.appendChild(optionDiv);
-    })
+    const readStatusSelect = createSelect(readingSatuses, 'read-status-select');
 
     let noRating;
 
@@ -422,14 +425,7 @@ function manuallyAddBook(){
 
     const readStatusTitle = createLabel('Read Status:', 'h3');
 
-    const readStatus = document.createElement('select');
-    readingSatuses.forEach(status => {
-        const statusOption = document.createElement('option');
-        statusOption.innerText = status;
-        statusOption.value = status;
-
-        readStatus.appendChild(statusOption);
-    })
+    const readStatus = createSelect(readingSatuses);
 
     readStatus.value = 'Read';
 
@@ -546,51 +542,35 @@ function generateLibraryPage(){
     const sortContainer = createDiv('', 'sort-container');
     filterBar.appendChild(sortContainer);
 
-    sortSelect = document.createElement('select');
-    sortSelect.classList.add('sort-select');
-    sortSelect.innerHTML = `
-        <option>A-Z</option>
-        <option>Z-A</option>
-        <option>Publish Date (old - new)</option>
-        <option>Publish Date (new - old)</option>
-        <option>Date Added (old - new)</option>
-        <option>Date Added (new - old)</option>
-        <option>Rating (High - Low)</option>
-        <option>Rating (Low - High)</option>
-    `;
+    const sortOptions = [
+        'A-Z', 'Z-A', 'Publish Date (old - new)', 'Publish Date (new - old)',
+        'Date Added (old - new)', 'Date Added (new - old)', 'Rating (High - Low)',
+        'Rating (Low - High)'
+    ]
+    sortSelect = createSelect(sortOptions, 'sort-select');
+    
     sortContainer.appendChild(sortSelect);
 
     const viewContainer = createDiv('', 'view-container');
     filterBar.appendChild(viewContainer);
 
-    viewSelect = document.createElement('select');
-    viewSelect.classList.add('view-select');
-    viewSelect.innerHTML = `
-        <option>Grid View</option>
-        <option>List View</option>
-    `;
+    viewSelect = createSelect(['Grid View', 'List View'], 'view-select');
     viewContainer.appendChild(viewSelect);
 
     const genreContainer = createDiv('', 'genre-container');
     filterBar.appendChild(genreContainer);
 
-    genreSelect = document.createElement('select');
-    genreSelect.classList.add('genre-select');
+    genreSelect = createSelect([], 'genre-select');
     genreContainer.appendChild(genreSelect);
 
-    readSelect = document.createElement('select');
-    const allStatuses = document.createElement('option');
-    allStatuses.innerText = 'Read/Reading/Unread';
-    allStatuses.value = 'Read/Reading/Unread';
-    readSelect.appendChild(allStatuses);
+    const readSelectChildren = ['Read/Reading/Unread']
 
     readingSatuses.forEach(status => {
-        const statusOption = document.createElement('option');
-        statusOption.innerText = status;
-        statusOption.value = status;
-
-        readSelect.appendChild(statusOption);
+        readSelectChildren.push(status)
     })
+
+    readSelect = createSelect(readSelectChildren, 'read-select');
+
     filterBar.appendChild(readSelect);
 
     const removeLocationDialog = document.createElement('dialog');
@@ -917,14 +897,7 @@ function openEditDialog(book, container){
 
     const readingStatusTitle = createLabel('Read Status:', 'h3');
 
-    const undreadOrReadSelect = document.createElement('select');
-
-    readingSatuses.forEach(s => {
-        const statusOption = document.createElement('option');
-        statusOption.innerText = s;
-
-        undreadOrReadSelect.appendChild(statusOption);
-    })
+    const undreadOrReadSelect = createSelect(readingSatuses);
 
     undreadOrReadSelect.value = book.readStatus;
 
@@ -989,60 +962,62 @@ function openEditDialog(book, container){
     openDialog(editBookDialog)
 }
 
+function createBookCard(book, viewType) {
+    const bookCard = createDiv('', `${viewType}-book`);
+    
+    const cover = createDiv('', `${viewType}-cover`);
+    cover.style.backgroundImage = `url(${book.cover})`;
+    
+    const title = createLabel(book.title, 'h3');
+    if(viewType === 'grid-view') {
+        title.classList.add('grid-view-title');
+    }
+    
+    const removeBtn = createButton('X');
+    if(viewType === 'grid-view') {
+        removeBtn.classList.add('grid-view-remove-btn');
+    }
+    removeBtn.addEventListener('click', () => deleteBook(book.id));
+    
+    if(book.rating) {
+        const ratingClass = viewType === 'grid-view' ? 'book-rating' : 'list-book-rating';
+        const ratingDiv = createDiv(book.rating, ratingClass);
+        const [bgColor, textColor] = getRatingColour(book.rating);
+        ratingDiv.style.backgroundColor = bgColor;
+        ratingDiv.style.color = textColor;
+        bookCard.appendChild(ratingDiv);
+    }
+    
+    const readStatus = createDiv(book.readStatus || 'Unread');
+    
+    bookCard.appendChild(cover);
+    bookCard.appendChild(title);
+    bookCard.appendChild(readStatus);
+    bookCard.appendChild(removeBtn);
+    
+
+    if(viewType === 'grid-view' && book.authors && book.authors.length > 0) {
+        const authorsHolder = document.createElement('h4');
+        book.authors.forEach(author => {
+            authorsHolder.innerText += `${author} `;
+        });
+        bookCard.insertBefore(authorsHolder, readStatus);
+        
+        const editBtn = createButton('Edit');
+        editBtn.addEventListener('click', () => openEditDialog(book, booksHolder));
+        bookCard.appendChild(editBtn);
+    }
+    
+    return bookCard;
+}
+
 function displayGridView(){
     booksHolder.innerHTML = '';
-
     const gridViewContainer = createDiv('', 'grid-view-container');
-
-    filteredBooks.forEach(b => {
-        const book = createDiv('', 'grid-view-book');
-
-        const cover = createDiv('', 'grid-view-cover');
-        cover.style.backgroundImage = `url(${b.cover})`;
-        
-        const title = createLabel(b.title, 'h3')
-        title.classList.add('grid-view-title');
-        
-        const authorsHolder = createLabel('', 'h3');
-        if(b.authors && b.authors.length > 0){
-            b.authors.forEach(author => {
-            authorsHolder.innerText += `${author} `;
-            })
-        }
-        
-
-        const editBookBtn = createButton('Edit');
-
-        editBookBtn.addEventListener('click', () => {openEditDialog(b, booksHolder)})
-
-        const removeBookBtn = createButton('X', 'grid-view-remove-btn');
-       
-        if(b.rating){
-            const ratingDiv = createDiv('', 'book-rationg');
-            ratingDiv.classList.add('book-rating');
-            ratingDiv.innerText = b.rating;
-            book.appendChild(ratingDiv);
-
-            const ratingColors = getRatingColour(b.rating);
-
-            ratingDiv.style.backgroundColor = ratingColors[0];
-            ratingDiv.style.color = ratingColors[1];
-        }
-        
-        const readStatus = createDiv();
-        if(!b.readStatus){
-            b.readStatus = 'Unread'
-        }
-        readStatus.innerText = b.readStatus;
-
-        removeBookBtn.addEventListener('click', () => {
-            deleteBook(b.id);
-        });
-
-        const bookChildren = [cover, title, authorsHolder, readStatus, removeBookBtn, editBookBtn]
-        appendChildren(bookChildren, book);
-
-        gridViewContainer.appendChild(book);
+    
+    filteredBooks.forEach(book => {
+        const bookCard = createBookCard(book, 'grid-view');
+        gridViewContainer.appendChild(bookCard);
     });
     
     booksHolder.appendChild(gridViewContainer);
@@ -1050,47 +1025,13 @@ function displayGridView(){
 
 function displayListView(){
     booksHolder.innerHTML = '';
-
     const listViewContainer = createDiv('', 'list-view-container');
-
-    filteredBooks.forEach(b => {
-        const book = createDiv('', 'list-view-book');
-
-        const cover = createDiv('', 'list-view-cover');
-        cover.style.backgroundImage = `url(${b.cover})`;
-        
-        const title = createLabel(b.title, 'h3');
-
-        const removeBookBtn = createButton('X');
-
-        if(b.rating){
-            const ratingDiv = createDiv(b.rating, 'list-book-rating');
-
-            const ratingColors = getRatingColour(b.rating);
-
-            ratingDiv.style.backgroundColor = ratingColors[0];
-            ratingDiv.style.color = ratingColors[1];
-
-            book.appendChild(ratingDiv);
-        }
-        
-
-        const readStatus = createDiv();
-        if(!b.readStatus){
-            b.readStatus = 'Unread'
-        }
-        readStatus.innerText = b.readStatus;
-
-        removeBookBtn.addEventListener('click', () => {
-            deleteBook(b.id);
-        });
-
-        const bookChildren = [cover, title, readStatus, removeBookBtn]
-        appendChildren(bookChildren, book)
-
-        listViewContainer.appendChild(book);
+    
+    filteredBooks.forEach(book => {
+        const bookCard = createBookCard(book, 'list-view');
+        listViewContainer.appendChild(bookCard);
     });
-
+    
     booksHolder.appendChild(listViewContainer);
 }
 
@@ -1158,8 +1099,16 @@ function openDialog(dialog){
     dialog.showModal();
 }
 
-function saveNewLocation(location){
-    user.locations.push(location);
+function saveNewLocation(location) {
+    if (!location || !location.trim()) {
+        alert('Please enter a location name');
+        return;
+    }
+    if (user.locations.includes(location)) {
+        alert('Location already exists');
+        return;
+    }
+    user.locations.push(location.trim());
     updateUserData();
     generateLibraryPage();
 }
