@@ -583,3 +583,9 @@ body {
     background-color: rgba(185, 28, 28, 1);
     transform: scale(1.1);
 }
+
+.edit-btn {
+    z-index: 99;
+    position: absolute;
+    top: 20px;
+}

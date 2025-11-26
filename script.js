@@ -1003,7 +1003,7 @@ function createBookCard(book, viewType) {
         });
         bookCard.insertBefore(authorsHolder, readStatus);
         
-        const editBtn = createButton('Edit');
+        const editBtn = createButton('Edit', 'edit-btn');
         editBtn.addEventListener('click', () => openEditDialog(book, booksHolder));
         bookCard.appendChild(editBtn);
     }
@@ -1018,6 +1018,10 @@ function displayGridView(){
     filteredBooks.forEach(book => {
         const bookCard = createBookCard(book, 'grid-view');
         gridViewContainer.appendChild(bookCard);
+
+        bookCard.addEventListener('click', () => {
+            openEditDialog(book, pageHolder)
+        })
     });
     
     booksHolder.appendChild(gridViewContainer);
