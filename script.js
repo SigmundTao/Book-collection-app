@@ -132,6 +132,10 @@ function displaySearchResults(data){
     searchResultsContainer.innerHTML = '';
     pageHolder.appendChild(searchResultsContainer);
 
+    const exitToHomeBtn = createButton('X', 'exit-to-home-btn');
+    exitToHomeBtn.addEventListener('click', generateLibraryPage);
+    searchResultsContainer.appendChild(exitToHomeBtn);
+
     data.items.forEach(book => {
         const bookTitle = book.volumeInfo.title || 'No title';
         const authors = book.volumeInfo.authors || ['Unknown author'];
@@ -411,7 +415,10 @@ function loadSearchPage(){
 
     const addManuallyBtn = createButton('+');
 
-    const children = [searchBar, searchButton, addManuallyBtn]
+    const exitToHomeBtn = createButton('X', 'exit-to-home-btn');
+    exitToHomeBtn.addEventListener('click', generateLibraryPage);
+
+    const children = [searchBar, searchButton, addManuallyBtn, exitToHomeBtn]
     appendChildren(children, searchPage)
 
     pageHolder.appendChild(searchPage);
@@ -979,6 +986,10 @@ function openEditDialog(book, container){
 
 function createBookCard(book, viewType) {
     const bookCard = createDiv('', `${viewType}-book`);
+
+    bookCard.addEventListener('click', () => {
+            openEditDialog(book, pageHolder)
+    })
     
     const cover = createDiv('', `${viewType}-cover`);
     cover.style.backgroundImage = `url(${book.cover})`;
@@ -1030,10 +1041,6 @@ function displayGridView(){
     filteredBooks.forEach(book => {
         const bookCard = createBookCard(book, 'grid-view');
         gridViewContainer.appendChild(bookCard);
-
-        bookCard.addEventListener('click', () => {
-            openEditDialog(book, pageHolder)
-        })
     });
     
     booksHolder.appendChild(gridViewContainer);

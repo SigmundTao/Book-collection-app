@@ -589,3 +589,9 @@ body {
     position: absolute;
     top: 20px;
 }
+
+.exit-to-home-btn {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+}
