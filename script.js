@@ -7,6 +7,7 @@ const pageHolder = document.getElementById('page-holder');
 let sortSelect;
 let viewSelect;
 let genreSelect;
+let librarySearchBar;
 let booksHolder;
 let searchResultsContainer;
 let locationSelect;
@@ -653,6 +654,17 @@ function generateLibraryPage(){
     removeLocationBtn.addEventListener('click', () => {
         openDialog(removeLocationDialog)
     })
+
+    librarySearchBar = createInput('text');
+    librarySearchBar.placeholder = 'Search Book...'
+    filterBar.appendChild(librarySearchBar);
+
+    let searchTimeout;
+
+    librarySearchBar.addEventListener("input", () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterBooks, 60);
+    });
     
     booksHolder = createDiv('', 'books-holder');
     libraryPage.appendChild(booksHolder);
@@ -1095,6 +1107,12 @@ function filterBooks(){
         filteredBooks = filteredBooks.filter(b => b.readStatus === readingStatus);
     }
 
+    const search = librarySearchBar.value.trim().toLowerCase();
+    if (search !== "") {
+        filteredBooks = filteredBooks.filter(b =>
+            b.title.toLowerCase().includes(search)
+        );
+    }
 
     displayMyBooks()
 }
