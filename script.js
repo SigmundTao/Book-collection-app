@@ -50,6 +50,27 @@ function createDiv(text, className){
     return div;
 }
 
+function createSelectableLocations(locationsDiv, book){
+    const bookIndex = user.books.findIndex(b => b.id === book.id);
+
+    user.locations.forEach(l => {
+        const locationDiv = createDiv('', 'change-location');
+        if(l === user.books[bookIndex].location){
+            locationDiv.classList.add('selected-change-location');
+        }
+        locationDiv.innerText = l;
+
+        locationDiv.addEventListener('click', () => {
+            document.querySelectorAll('.change-location').forEach(element => {
+                element.classList.remove('selected-change-location');
+            });
+            locationDiv.classList.add('selected-change-location');
+        })
+
+        locationsDiv.appendChild(locationDiv);
+    })
+}
+
 function appendChildren(childArray, parent){
     childArray.forEach(child => {
         parent.appendChild(child);
@@ -436,6 +457,8 @@ function loadSearchPage(){
     addManuallyBtn.addEventListener('click', () => {
         manuallyAddBook()
     })
+
+    searchBar.focus()
 }
 
 //////////////////// Adding books ////////////////////////
@@ -1154,26 +1177,6 @@ function removeLocation(location, dialog){
     generateLibraryPage()
 }
 
-function createSelectableLocations(locationsDiv, book){
-    const bookIndex = user.books.findIndex(b => b.id === book.id);
 
-    user.locations.forEach(l => {
-        const locationDiv = document.createElement('div');
-        locationDiv.classList.add('change-location');
-        if(l === user.books[bookIndex].location){
-            locationDiv.classList.add('selected-change-location');
-        }
-        locationDiv.innerText = l;
-
-        locationDiv.addEventListener('click', () => {
-            document.querySelectorAll('.change-location').forEach(element => {
-                element.classList.remove('selected-change-location');
-            });
-            locationDiv.classList.add('selected-change-location');
-        })
-
-        locationsDiv.appendChild(locationDiv);
-    })
-}
 
 generateLibraryPage();
