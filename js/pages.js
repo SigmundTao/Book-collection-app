@@ -19,10 +19,7 @@ export function generateLibraryPage(){
     const libraryPage = createDiv('', 'library-page');
 
     const titleSection = createDiv('My Books', 'title-section');
-    libraryPage.appendChild(titleSection);
-
     const filterBar = createDiv('', 'filter-bar');
-    libraryPage.appendChild(filterBar);
 
     const sortContainer = createDiv('', 'sort-container');
     filterBar.appendChild(sortContainer);
@@ -36,28 +33,23 @@ export function generateLibraryPage(){
     sortContainer.appendChild(sortSelect);
 
     const viewContainer = createDiv('', 'view-container');
-    filterBar.appendChild(viewContainer);
 
     viewSelect = createSelect(['Grid View', 'List View'], 'view-select');
     viewContainer.appendChild(viewSelect);
 
     const genreContainer = createDiv('', 'genre-container');
-    filterBar.appendChild(genreContainer);
 
     genreSelect = createSelect([], 'genre-select');
-    genreContainer.appendChild(genreSelect);
 
     const readSelectChildren = ['Read/Reading/Unread'];
     readingStatuses.forEach(status => readSelectChildren.push(status));
 
     readSelect = createSelect(readSelectChildren, 'read-select');
-    filterBar.appendChild(readSelect);
 
     const locationContainer = createDiv('', 'location-container');
     locationSelect = createLocationSelect(filterBooks);
     locationSelect.classList.add('location-select');
     locationContainer.appendChild(locationSelect);
-    filterBar.appendChild(locationContainer);
 
     const defaultLocation = createDiv('All Locations', 'location-div');
     defaultLocation.classList.add('selected-location');
@@ -70,19 +62,18 @@ export function generateLibraryPage(){
     });
 
     const addNewLocationBtn = createButton('Add New Location');
-    filterBar.appendChild(addNewLocationBtn);
 
     librarySearchBar = createInput('text');
     librarySearchBar.placeholder = 'Search Book...';
-    filterBar.appendChild(librarySearchBar);
+
+    const filterBarItems = [sortContainer, viewContainer, genreContainer, readSelect, locationContainer, addNewLocationBtn, librarySearchBar]
+    appendChildren(filterBarItems, filterBar)
 
     const debouncedFilter = debounce(filterBooks, 60);
     librarySearchBar.addEventListener("input", debouncedFilter);
     
     booksHolder = createDiv('', 'books-holder');
-    libraryPage.appendChild(booksHolder);
 
-    pageHolder.appendChild(libraryPage);
 
     sortSelect.addEventListener('change', () => sortBooks(sortSelect.value));
     viewSelect.addEventListener('change', displayMyBooks);
@@ -91,7 +82,6 @@ export function generateLibraryPage(){
 
     // Location dialog
     const newLocationDialog = document.createElement('dialog');
-    libraryPage.appendChild(newLocationDialog);
 
     const locationInput = createInput('text', '');
     newLocationDialog.appendChild(locationInput);
@@ -113,7 +103,6 @@ export function generateLibraryPage(){
 
     const addNewBookBtn = createButton('+', 'add-new-book-btn');
     addNewBookBtn.addEventListener('click', loadSearchPage);
-    libraryPage.appendChild(addNewBookBtn);
 
     const openWishlistBtn = createDiv('', 'open-wish-list-button');
     const heartImage = document.createElement('div');
@@ -121,7 +110,11 @@ export function generateLibraryPage(){
     heartImage.style.backgroundImage = `url('./heart.svg')`;
     openWishlistBtn.appendChild(heartImage);
     openWishlistBtn.addEventListener('click', generateWishListPage);
-    libraryPage.appendChild(openWishlistBtn);
+
+    const libraryPageChildren = [titleSection, filterBar, booksHolder, newLocationDialog, addNewBookBtn, openWishlistBtn];
+    appendChildren(libraryPageChildren, libraryPage);
+
+    pageHolder.appendChild(libraryPage);
 
     fillGenreOptions();
     sortSelect.value = 'A-Z';
@@ -178,15 +171,15 @@ export function generateWishListPage(){
 
     closeWishListBtn.addEventListener('click', generateLibraryPage);
 
-    user.wishlist.forEach(b => {
-        const book = createBook(b);
+    user.wishlist.forEach(item => {
+        const book = createBook(item);
         bookHolder.appendChild(book);
 
         const addToLibraryBtn = createButton('+');
         book.appendChild(addToLibraryBtn);
 
         addToLibraryBtn.addEventListener('click', () => {
-            user.books.push(b);
+            user.books.push(item);
             user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
             updateUserData();
             generateWishListPage();
@@ -194,7 +187,7 @@ export function generateWishListPage(){
 
         const removeBtn = createButton('X');
         removeBtn.addEventListener('click', () => {
-            user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
+            user.wishlist.splice(user.wishlist.findIndex(element => element.id === item.id), 1);
             updateUserData();
             generateWishListPage();
         });
@@ -259,14 +252,14 @@ function displaySearchResults(data){
         const categoriesHolder = createDiv('', 'categories-holder');
 
         categories.forEach(category => {
-            const c = createDiv(category, 'category');
-            categoriesHolder.appendChild(c);
+            const categoryElement = createDiv(category, 'category');
+            categoriesHolder.appendChild(categoryElement);
         });
 
         const identifiersHolder = createDiv();
-        identifiers.forEach(i => {
-            const type = createDiv(i.type);
-            const id = createDiv(i.identifier);
+        identifiers.forEach(identifier => {
+            const type = createDiv(identifier.type);
+            const id = createDiv(identifier.identifier);
             const div = createDiv();
             div.appendChild(type);
             div.appendChild(id);

@@ -1,4 +1,4 @@
-// Export each function so other files can import them
+// Functions to create html elements
 export function createLabel(text, tag = 'h3'){
     const label = document.createElement(tag);
     label.innerText = text;
@@ -62,7 +62,7 @@ export function debounce(func, wait) {
     };
 }
 
-export function getRatingColour(rating){
+export function colorRating(rating){
     if(rating <= 4) return ['red', 'white'];
     if(rating <= 6) return ['orange', 'white'];
     if(rating <= 10) return ['green', 'white'];

@@ -1,4 +1,4 @@
-import { createDiv, createLabel, createButton, getRatingColour } from './helpers.js';
+import { createDiv, createLabel, createButton, colorRating, appendChildren } from './helpers.js';
 import { user } from './storage.js';
 
 export function createBook(book){
@@ -44,7 +44,7 @@ export function createBookCard(book, viewType, onDelete, onEdit) {
     if(book.rating) {
         const ratingClass = viewType === 'grid-view' ? 'book-rating' : 'list-book-rating';
         const ratingDiv = createDiv(book.rating, ratingClass);
-        const [bgColor, textColor] = getRatingColour(book.rating);
+        const [bgColor, textColor] = colorRating(book.rating);
         ratingDiv.style.backgroundColor = bgColor;
         ratingDiv.style.color = textColor;
         bookCard.appendChild(ratingDiv);
@@ -52,10 +52,8 @@ export function createBookCard(book, viewType, onDelete, onEdit) {
     
     const readStatus = createDiv(book.readStatus || 'Unread');
     
-    bookCard.appendChild(cover);
-    bookCard.appendChild(title);
-    bookCard.appendChild(readStatus);
-    bookCard.appendChild(removeBtn);
+    const children = [cover, title, readStatus, removeBtn];
+    appendChildren(children, bookCard);
 
     if(viewType === 'grid-view' && book.authors && book.authors.length > 0) {
         const authorsHolder = document.createElement('h4');
