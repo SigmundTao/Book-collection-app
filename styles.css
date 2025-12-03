@@ -5,6 +5,7 @@
 body {
     height: 100vh;
     width: 100vw;
+    background-color: darkgray;
 }
 
 #container {
@@ -274,7 +275,7 @@ body {
     gap: 5px;
     padding: 20px;
     min-height: 80vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: #e5e7eb;
 }
 
 .grid-view-book {
