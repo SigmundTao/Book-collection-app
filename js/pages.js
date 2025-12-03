@@ -22,8 +22,6 @@ export function generateLibraryPage(){
     const filterBar = createDiv('', 'filter-bar');
 
     const sortContainer = createDiv('', 'sort-container');
-    filterBar.appendChild(sortContainer);
-
     const sortOptions = [
         'A-Z', 'Z-A', 'Publish Date (old - new)', 'Publish Date (new - old)',
         'Date Added (old - new)', 'Date Added (new - old)', 'Rating (High - Low)',
@@ -33,17 +31,15 @@ export function generateLibraryPage(){
     sortContainer.appendChild(sortSelect);
 
     const viewContainer = createDiv('', 'view-container');
-
     viewSelect = createSelect(['Grid View', 'List View'], 'view-select');
     viewContainer.appendChild(viewSelect);
 
     const genreContainer = createDiv('', 'genre-container');
-
     genreSelect = createSelect([], 'genre-select');
+    genreContainer.appendChild(genreSelect);
 
     const readSelectChildren = ['Read/Reading/Unread'];
     readingStatuses.forEach(status => readSelectChildren.push(status));
-
     readSelect = createSelect(readSelectChildren, 'read-select');
 
     const locationContainer = createDiv('', 'location-container');
@@ -66,14 +62,13 @@ export function generateLibraryPage(){
     librarySearchBar = createInput('text');
     librarySearchBar.placeholder = 'Search Book...';
 
-    const filterBarItems = [sortContainer, viewContainer, genreContainer, readSelect, locationContainer, addNewLocationBtn, librarySearchBar]
-    appendChildren(filterBarItems, filterBar)
+    const filterBarItems = [sortContainer, viewContainer, genreContainer, readSelect, locationContainer, addNewLocationBtn, librarySearchBar];
+    appendChildren(filterBarItems, filterBar);
 
     const debouncedFilter = debounce(filterBooks, 60);
     librarySearchBar.addEventListener("input", debouncedFilter);
     
     booksHolder = createDiv('', 'books-holder');
-
 
     sortSelect.addEventListener('change', () => sortBooks(sortSelect.value));
     viewSelect.addEventListener('change', displayMyBooks);
@@ -82,7 +77,6 @@ export function generateLibraryPage(){
 
     // Location dialog
     const newLocationDialog = document.createElement('dialog');
-
     const locationInput = createInput('text', '');
     newLocationDialog.appendChild(locationInput);
 
@@ -180,7 +174,7 @@ export function generateWishListPage(){
 
         addToLibraryBtn.addEventListener('click', () => {
             user.books.push(item);
-            user.wishlist.splice(user.wishlist.findIndex(e => e.id === b.id), 1);
+            user.wishlist.splice(user.wishlist.findIndex(e => e.id === item.id), 1);
             updateUserData();
             generateWishListPage();
         });
@@ -282,12 +276,429 @@ function displaySearchResults(data){
 }
 
 function loadBookPage(title, authors, description, language, categories, image, identifiers, id, averageRating, publishedDate){
-    // Your existing loadBookPage code...
-    // I'll skip this for brevity, but just copy it over
+    const pageHolder = document.getElementById('page-holder');
+    pageHolder.innerHTML = '';
+    
+    const bookPageContainer = createDiv('', 'book-page-container');
+    
+    const authorsArray = authors;
+    const bookCoverURL = image;
+
+    const leftSideHolder = createDiv('', 'book-page-left');
+
+    const bookCover = createDiv('', 'book-page-cover');
+    bookCover.style.backgroundImage = `url(${bookCoverURL})`;
+
+    leftSideHolder.appendChild(bookCover);
+
+    const rightSideHolder = createDiv('', 'book-page-right');
+
+    const bookTitle = createDiv(title, 'book-page-title');
+    rightSideHolder.appendChild(bookTitle);
+
+    const authorsHolder = createDiv();
+    rightSideHolder.appendChild(authorsHolder);
+    authorsArray.forEach(author => {
+        const authorCard = createDiv(author, 'author-card');
+        authorsHolder.appendChild(authorCard);
+    });
+
+    const categoriesHolder = createDiv();
+    rightSideHolder.appendChild(categoriesHolder);
+    categories.forEach(category => {
+        const genreCard = createDiv(category, 'book-page-category');
+        categoriesHolder.appendChild(genreCard);
+    });
+
+    const bookDescription = document.createElement('p');
+    bookDescription.innerText = description;
+    bookDescription.classList.add('book-page-description');
+    rightSideHolder.appendChild(bookDescription);
+
+    const languageHolder = createDiv('', 'book-page-language-holder');
+    rightSideHolder.appendChild(languageHolder);
+
+    const langTitle = createDiv('Lang:', 'book-page-lang-title');
+    languageHolder.appendChild(langTitle);
+
+    const bookLanguage = createDiv(language);
+    languageHolder.appendChild(bookLanguage);
+
+    const identifiersArray = identifiers;
+    const identifiersHolder = createDiv();
+    rightSideHolder.appendChild(identifiersHolder);
+
+    identifiersArray.forEach(i => {
+        const type = createDiv(i.type);
+        const idDiv = createDiv(i.identifier);
+        const div = createDiv();
+        div.appendChild(type);
+        div.appendChild(idDiv);
+        identifiersHolder.appendChild(div);
+    });
+
+    const addToWishListBtn = createButton('W');
+    leftSideHolder.appendChild(addToWishListBtn);
+
+    addToWishListBtn.addEventListener('click', () => {
+        addToWishlist({
+            title: title,
+            cover: image,
+            categories: categories,
+            description: description,
+            language: language,
+            identifiers: identifiers,
+            id: id,
+            publishedDate: publishedDate,
+            authors: authors,
+        });
+    });
+
+    const addBookBtn = createButton('+', 'Add-book-btn');
+    leftSideHolder.appendChild(addBookBtn);
+
+    //add book dialog
+    const addBookDialog = document.createElement('dialog');
+    addBookDialog.id = 'add-book-dialog';
+    bookPageContainer.appendChild(addBookDialog);
+
+    const titleLabel = createLabel('Title:', 'h3');
+    const dialogTitle = createInput('text', title);
+
+    const dialogImage = createDiv('', 'add-book-dialog-image');
+
+    const linkLabel = createLabel('Photo URL:', 'h3');
+    const imageLink = createInput('text', image); 
+
+    dialogImage.style.backgroundImage = `url(${imageLink.value})`;
+
+    const ratingLabel = createLabel('BookRating', 'h3');
+    const rating = createInput('number', '');
+    rating.classList.add('add-book-rating', 'rating');
+    rating.min = 0;
+    rating.max = 10;
+    rating.style.display = 'inline';
+
+    const locationsLabel = createLabel('Location:');
+
+    const locationsHolder = createSelect(user.locations);
+
+    const readLabel = createLabel('Read Status', 'h3');
+
+    const readStatusSelect = createSelect(readingStatuses, 'read-status-select');
+
+    let noRating;
+
+    readStatusSelect.addEventListener('change', () => {
+        if(readStatusSelect.value === 'Unread'){
+            ratingLabel.style.display = 'none';
+            rating.style.display = 'none';
+            noRating = true;
+        } else {
+            rating.style.display = 'block';
+            ratingLabel.style.display = 'block';
+            noRating = false;
+        }
+    });
+
+    const saveBookBtn = createButton('Add Book');
+
+    const closeAddBookDialogBtn = createButton('X', 'close-add-book-dialog-btn');
+
+    const children = [
+        titleLabel,
+        dialogTitle,
+        dialogImage,
+        linkLabel,
+        imageLink,
+        ratingLabel,
+        rating,
+        locationsLabel,
+        locationsHolder,
+        readLabel,
+        readStatusSelect,
+        saveBookBtn,
+        closeAddBookDialogBtn
+    ];
+    
+    appendChildren(children, addBookDialog);
+
+    saveBookBtn.addEventListener('click', () => {
+        const ratingValue = noRating ? null : rating.value;
+
+        if(addBook({
+            title: dialogTitle.value,
+            cover: imageLink.value,
+            categories: categories,
+            description: description,
+            language: language,
+            identifiers: identifiers,
+            id: id,
+            rating: ratingValue,
+            readStatus: readStatusSelect.value,
+            publishedDate: publishedDate,
+            dateAdded: new Date().toISOString(),
+            location: locationsHolder.value,
+            authors: authors
+        })){
+            closeDialog(addBookDialog);
+            generateLibraryPage();
+        }
+    });
+
+    closeAddBookDialogBtn.addEventListener('click', () => {
+        closeDialog(addBookDialog);
+    });
+    
+    addBookBtn.addEventListener('click', () => {
+        openDialog(addBookDialog);
+    });
+
+    const quitBtn = createButton('X', 'book-page-quit-btn');
+    leftSideHolder.appendChild(quitBtn);
+
+    quitBtn.addEventListener('click', () => {
+        generateLibraryPage();
+    });
+    
+    bookPageContainer.appendChild(leftSideHolder);
+    bookPageContainer.appendChild(rightSideHolder);
+    pageHolder.appendChild(bookPageContainer);
 }
 
 function manuallyAddBook(){
-    // Your existing manuallyAddBook code...
+    const pageHolder = document.getElementById('page-holder');
+    pageHolder.innerHTML = '';
+    const manualAddBookPage = document.createElement('div');
+
+    const title = createLabel('Title:', 'h3');
+    const titleInput = createInput('text', '');
+
+    const authorTitle = createLabel('Author:', 'h3');
+    const authorInput = createInput('text', '');
+
+    const coverDisplay = document.createElement('div');
+    
+    const imageLinkTitle = createLabel('Image Link:', 'h3');
+    const imageLinkInput = createInput('text', '');
+
+    const genreTitle = createLabel('Categories', 'h3');
+
+    const genreHolder = createDiv();
+    
+    genres.forEach(genre => {
+        const genreCard = createGenreCard(genre);
+        genreHolder.appendChild(genreCard);
+    });
+
+    const descriptionTitle = createLabel('Description:', 'h3');
+
+    const description = document.createElement('textarea');
+
+    const ratingTitle = createLabel('Rating:', 'h3');
+
+    const rating = createInput('number', '');
+    rating.min = 1;
+    rating.max = 10;
+
+    const readStatusTitle = createLabel('Read Status:', 'h3');
+
+    const readStatus = createSelect(readingStatuses);
+
+    readStatus.value = 'Read';
+
+    readStatus.addEventListener('change', () => {
+        if(readStatus.value !== 'Read'){
+            rating.style.display = 'none';
+            ratingTitle.style.display = 'none';
+        } else {
+            rating.style.display = 'block';
+            ratingTitle.style.display = 'block';
+        }
+    });
+
+    const locationTitle = createLabel('Book Location:', 'h3');
+    const locationsSelect = createLocationSelect();
+    locationsSelect.classList.add('manual-location-select');
+
+    const id = generateBookId();
+
+    const langInputTitle = createLabel('Language:', 'h3');
+    const languageInput = createInput('text', '');
+
+    const saveBookBtn = createButton('save');
+
+    const children = [
+        title,
+        titleInput,
+        authorTitle,
+        authorInput,
+        coverDisplay,
+        imageLinkTitle,
+        imageLinkInput,
+        genreTitle,
+        genreHolder,
+        descriptionTitle,
+        description,
+        readStatusTitle,
+        readStatus,
+        ratingTitle,
+        rating,
+        locationTitle,
+        locationsSelect,
+        langInputTitle,
+        languageInput,
+        saveBookBtn
+    ];
+
+    appendChildren(children, manualAddBookPage);
+
+    pageHolder.appendChild(manualAddBookPage);
+
+    let selectedGenres = [];
+
+    saveBookBtn.addEventListener('click', () => {
+        selectedGenres = [];
+        document.querySelectorAll('.selected-genre').forEach(g => {
+            selectedGenres.push(g.innerText);
+        });
+
+        if(addBook({
+            title: titleInput.value,
+            cover: imageLinkInput.value,
+            categories: selectedGenres,
+            description: description.value,
+            language: languageInput.value,
+            id: id,
+            rating: rating.value,
+            readStatus: readStatus.value,
+            dateAdded: new Date().toISOString(),
+            location: document.querySelector('.selected-location').innerText,
+            authors: [authorInput.value],
+        })){
+            generateLibraryPage();
+        }
+    });
+}
+
+function openEditDialog(book){
+    const pageHolder = document.getElementById('page-holder');
+    const editBookDialog = document.createElement('dialog');
+
+    const dialogDiv = createDiv('', 'dialog-div');
+    editBookDialog.appendChild(dialogDiv);
+
+    const title = createLabel('Title:', 'h3');
+    const editBookTitle = createInput('text', book.title);
+    const editBookPhoto = document.createElement('div');
+    editBookPhoto.style.backgroundImage = `url(${book.cover})`;
+
+    const link = createLabel('Book URL:', 'h3');
+    const editBookLink = createInput('text', book.cover);
+
+    const locationsDiv = createDiv();
+    createSelectableLocations(locationsDiv, book);
+
+    const readingStatusTitle = createLabel('Read Status:', 'h3');
+
+    const unreadOrReadSelect = createSelect(readingStatuses);
+
+    unreadOrReadSelect.value = book.readStatus;
+
+    const bookRatingTitle = createLabel('Rating:', 'h3');
+
+    const editBookRating = createInput('number', book.rating);
+    editBookRating.max = 10;
+    editBookRating.min = 1;
+
+    const saveBtn = createButton('save');
+
+    const dialogDivChildren = [title, editBookTitle, editBookPhoto, link, editBookLink, locationsDiv, readingStatusTitle, unreadOrReadSelect, bookRatingTitle, editBookRating, saveBtn];
+    appendChildren(dialogDivChildren, dialogDiv);
+    
+    let noRating = true;
+
+    if(book.readStatus !== 'Unread'){
+        editBookRating.style.display = 'inline';
+        bookRatingTitle.style.display = 'inline-block';
+        noRating = false;
+    } else {
+        editBookRating.style.display = 'none';
+        bookRatingTitle.style.display = 'none';
+    }
+
+    unreadOrReadSelect.addEventListener('change', () => {
+        if(unreadOrReadSelect.value === 'Unread'){
+            editBookRating.style.display = 'none';
+            bookRatingTitle.style.display = 'none';
+            noRating = true;
+        } else {
+            editBookRating.style.display = 'inline';
+            bookRatingTitle.style.display = 'inline-block';
+            noRating = false;
+        }
+    });
+
+    saveBtn.addEventListener('click', () => {
+        const bookIndex = user.books.findIndex(i => i.id === book.id);
+
+        const ratingValue = noRating ? null : editBookRating.value;
+
+        user.books[bookIndex].rating = ratingValue;
+        user.books[bookIndex].readStatus = unreadOrReadSelect.value;
+        user.books[bookIndex].cover = editBookLink.value;
+        user.books[bookIndex].title = editBookTitle.value;
+        user.books[bookIndex].location = document.querySelector('.selected-change-location').innerText;
+        
+        updateUserData();
+        closeDialog(editBookDialog);
+        displayMyBooks();
+    });
+
+    const closeDialogBtn = createButton('X');
+    dialogDiv.appendChild(closeDialogBtn);
+
+    closeDialogBtn.addEventListener('click', () => {
+        closeDialog(editBookDialog);
+    });
+
+    pageHolder.appendChild(editBookDialog);
+    openDialog(editBookDialog);
+}
+
+function generateRemoveLocations(removeLocationDialog){
+    removeLocationDialog.innerHTML = '';
+
+    const removeTitle = createLabel('Remove Location:', 'h2');
+
+    removeLocationDialog.appendChild(removeTitle);
+
+    user.locations.forEach(l => {
+        const removeLocationCard = createDiv();
+        
+        const locationTitle = createLabel(l, 'h3');
+
+        const removeBtn = createButton('X');
+
+        removeLocationCard.appendChild(locationTitle);
+        removeLocationCard.appendChild(removeBtn);
+
+        removeLocationDialog.appendChild(removeLocationCard);
+
+        removeBtn.addEventListener('click', () => {
+            user.locations.splice(user.locations.findIndex(e => e === l), 1);
+            updateUserData();
+            generateRemoveLocations(removeLocationDialog);
+        });
+    });
+
+    const closeBtn = createButton('Close Dialog');
+    closeBtn.addEventListener('click', () => {
+        closeDialog(removeLocationDialog);
+        generateLibraryPage();
+    });
+
+    removeLocationDialog.appendChild(closeBtn);
 }
 
 function displayMyBooks(){
@@ -322,10 +733,6 @@ function displayListView(){
     });
     
     booksHolder.appendChild(listViewContainer);
-}
-
-function openEditDialog(book){
-    // Your existing openEditDialog code...
 }
 
 function sortBy(field, ascending = true) {
